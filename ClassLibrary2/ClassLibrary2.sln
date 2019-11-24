@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.902
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithm", "ClassLibrary2\Algorithm.csproj", "{738A5D20-3E99-4764-89ED-BFABEE1259F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleView", "ConsoleView\ConsoleView.csproj", "{1DDB7435-FE50-4160-8606-3AFF10A78C3D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{738A5D20-3E99-4764-89ED-BFABEE1259F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{738A5D20-3E99-4764-89ED-BFABEE1259F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{738A5D20-3E99-4764-89ED-BFABEE1259F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{738A5D20-3E99-4764-89ED-BFABEE1259F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DDB7435-FE50-4160-8606-3AFF10A78C3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DDB7435-FE50-4160-8606-3AFF10A78C3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DDB7435-FE50-4160-8606-3AFF10A78C3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DDB7435-FE50-4160-8606-3AFF10A78C3D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FC538F0E-07D0-458F-8D07-4AAD2804C467}
+	EndGlobalSection
+EndGlobal
