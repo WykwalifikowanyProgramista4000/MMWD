@@ -12,9 +12,9 @@ namespace Algorithm
 
         private static void IncrementIdCounter() { idCounter++; }
 
-        public static City MakeCity(int X, int Y)
+        public static City MakeCity()
         {
-            City city = new City(X, Y, idCounter);
+            City city = new City(idCounter);
             IncrementIdCounter();
             return city;
         }
