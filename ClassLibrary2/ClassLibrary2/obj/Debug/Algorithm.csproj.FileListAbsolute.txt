@@ -1,0 +1,12 @@
+C:\Users\Wojti\source\repos\ClassLibrary2\ClassLibrary2\bin\Debug\Algorithm.dll
+C:\Users\Wojti\source\repos\ClassLibrary2\ClassLibrary2\bin\Debug\Algorithm.pdb
+C:\Users\Wojti\source\repos\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.csprojAssemblyReference.cache
+C:\Users\Wojti\source\repos\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.csproj.CoreCompileInputs.cache
+C:\Users\Wojti\source\repos\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.dll
+C:\Users\Wojti\source\repos\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.pdb
+C:\Users\Wojti\Documents\AGH\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\bin\Debug\Algorithm.dll
+C:\Users\Wojti\Documents\AGH\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\bin\Debug\Algorithm.pdb
+C:\Users\Wojti\Documents\AGH\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.csprojAssemblyReference.cache
+C:\Users\Wojti\Documents\AGH\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.csproj.CoreCompileInputs.cache
+C:\Users\Wojti\Documents\AGH\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.dll
+C:\Users\Wojti\Documents\AGH\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.pdb
