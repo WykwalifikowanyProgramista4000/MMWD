@@ -10,3 +10,9 @@ C:\Users\Wojti\Documents\AGH\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debu
 C:\Users\Wojti\Documents\AGH\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.csproj.CoreCompileInputs.cache
 C:\Users\Wojti\Documents\AGH\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.dll
 C:\Users\Wojti\Documents\AGH\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.pdb
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\bin\Debug\Algorithm.dll
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\bin\Debug\Algorithm.pdb
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.csprojAssemblyReference.cache
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.csproj.CoreCompileInputs.cache
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.dll
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Debug\Algorithm.pdb

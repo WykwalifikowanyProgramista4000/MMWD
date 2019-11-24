@@ -8,13 +8,16 @@ namespace Algorithm
 {
     public class City
     {
-        private List<DelieveryContract> _availableContracts = new List<DelieveryContract>();
-        private List<City> _connectedCities = new List<City>();
+        #region Parameters
 
         private double _xPosition;
         private double _yPosition;
-
         private readonly int _id;
+        private List<DelieveryContract> _availableContracts = new List<DelieveryContract>();
+
+        private List<int> _connectedCitiesID;
+
+        #endregion 
 
         public double X // todo dodać delegate do reewaluacji dystansów
         {
@@ -28,6 +31,8 @@ namespace Algorithm
             set { _yPosition = value; }
         }
 
+        #region Constructors
+
         public City(float X, float Y, int ID)
         {
             _xPosition = X;
@@ -36,11 +41,35 @@ namespace Algorithm
             _id = ID;
         }
 
+        #endregion
+
+        #region Getters
 
         public int GetID() { return _id; }
 
-        public List<City> GetConnectedCities() { return _connectedCities; }
+        public List<int> GetConnectedCities() { return _connectedCitiesID; }
 
-        public void AddConnectedCity(City city) { _connectedCities.Add(city); }
+        #endregion
+
+        #region Public Methods
+
+        public void AddConnectedCity(int cityID) { _connectedCitiesID.Add(cityID); }
+
+        public void AddConnectedCities(List<int> cityIDs)
+        {
+            foreach(int id in cityIDs)
+            {
+                if(_connectedCitiesID.FindIndex(x => x == id) == -1)
+                {
+                    _connectedCitiesID.Add(id);
+                }
+                else
+                {
+                    Console.WriteLine("City with ID matching ", id, " already found in connected cities. Skipping to next ID.");
+                }
+            }
+        }
+
+        #endregion
     }
 }

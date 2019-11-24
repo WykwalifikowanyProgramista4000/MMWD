@@ -16,12 +16,11 @@ namespace ConsoleView
             World.AddCity(2, 2);
             World.AddCity(4, 4);
 
-            World.cities[0].AddConnectedCity(World.cities[1]);
-            World.cities[0].AddConnectedCity(World.cities[2]);
+            World.cities[0].AddConnectedCities(new List<int>() {1,1,2});
 
-            World.EvaluateDistancesMatrix();
+            //World.EvaluateDistancesMatrix(); //Temporary disabled - the way connected cities are stored has been changed
 
-            PrintMatrix(World.distanceCityToCityMatrix);
+            //PrintMatrix(World.distanceCityToCityMatrix);
 
             Console.ReadLine();
 

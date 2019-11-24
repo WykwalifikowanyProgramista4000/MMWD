@@ -14,19 +14,19 @@ namespace Algorithm
 
         public static double[,] distanceCityToCityMatrix;
 
-        public static void EvaluateDistancesMatrix()
-        {
-            distanceCityToCityMatrix = new double[cities.Count, cities.Count];
-            FillWithNaN();
+        //public static void EvaluateDistancesMatrix()
+        //{
+        //    distanceCityToCityMatrix = new double[cities.Count, cities.Count];
+        //    FillWithNaN();
 
-            foreach (City city in cities)
-            {
-                foreach(City connectedCity in city.GetConnectedCities())
-                {
-                    distanceCityToCityMatrix[city.GetID(), connectedCity.GetID()] = distanceCityToCityMatrix[connectedCity.GetID(), city.GetID()] = EvaluateDistance(city, connectedCity);
-                }
-            }
-        }
+        //    foreach (City city in cities)
+        //    {
+        //        foreach(City connectedCity in city.GetConnectedCities())
+        //        {
+        //            distanceCityToCityMatrix[city.GetID(), connectedCity.GetID()] = distanceCityToCityMatrix[connectedCity.GetID(), city.GetID()] = EvaluateDistance(city, connectedCity);
+        //        }
+        //    }
+        //}
 
         private static void FillWithNaN()
         {
@@ -34,7 +34,7 @@ namespace Algorithm
             {
                 for (int i = 0; i < World.cities.Count; i++)
                 {
-                    distanceCityToCityMatrix[j, i] = 69;
+                    distanceCityToCityMatrix[j, i] = Double.NaN;
                 }
             }
         }
@@ -50,7 +50,7 @@ namespace Algorithm
         public static void AddCity(int X, int Y)    // temporary
         {
             cities.Add(CityFactory.MakeCity(X, Y));
-            EvaluateDistancesMatrix();
+            //EvaluateDistancesMatrix();
         }
     }
 }
