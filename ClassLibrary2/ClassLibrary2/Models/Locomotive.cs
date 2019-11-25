@@ -8,22 +8,76 @@ namespace Algorithm
 {
     public static class Locomotive
     {
+        #region Parameters
+
         private static double _cash;
+
         private static double _weight;
+        private static double _maxWeight;
+        private static bool _maxWeightSetFlag = false;
+
         private static int _waggonCount;
+        private static int _maxWaggonCount;
+        private static bool _maxWaggonCountSetFlag = false;
 
         private static List<DelieveryContract> _delieveryContracts = new List<DelieveryContract>();
 
         private static int _currentLocationID;
 
         private static int _targetLocationID;
-
         private static bool _targetLocationSetFlag = false;
 
+
+        #endregion
+
+        #region Get/Set
 
         public static double Cash
         {
             get { return _cash; }
+        }
+
+        public static double Weight
+        {
+            get { return _weight; }
+        }
+        public static double MaxWeight
+        {
+            get { return _maxWeight; }
+            set
+            {
+                if (_maxWaggonCountSetFlag == false)
+                {
+                    _maxWeight = value;
+                    _maxWeightSetFlag = true;
+                }
+                else
+                {
+                    Console.WriteLine("Max weight has been already set to '" + _maxWeight + "' and cannot be set to '" + value + "'");
+                }
+            }
+        }
+
+        public static int WaggonCount
+        {
+            get { return _waggonCount; }
+
+        }
+        public static int MaxWaggonCount
+        {
+            get { return _maxWaggonCount; }
+            set
+            {
+                if(_maxWaggonCountSetFlag == false)
+                {
+                    _maxWaggonCount = value;
+                    _maxWaggonCountSetFlag = true;
+                }
+                else
+                {
+                    Console.WriteLine("Max waggon count has been already set to '" + _maxWaggonCount + "' and cannot be set to '" + value + "'");
+                }
+            }
         }
 
         public static List<DelieveryContract> DelieveryContracts
@@ -36,15 +90,7 @@ namespace Algorithm
             get { return _targetLocationID; }
             set
             {
-                if(_targetLocationSetFlag == false)
-                {
-                    _targetLocationID = value;
-                    _targetLocationSetFlag = true;
-                }
-                else
-                {
-                    Console.WriteLine("Target location has been already set to '" + _targetLocationID + "' and cannot be set to '" + value + "'");
-                }
+                
             }
         }
 
@@ -54,10 +100,15 @@ namespace Algorithm
             set { _currentLocationID = value; }
         }
 
+        #endregion
+
+        #region Methods
+
         public static DelieveryContract GetDelieveryContractByID(int contractID)
         {
             return _delieveryContracts.Find(contract => contract.ID == contractID);
         }
+
 
         public static void SignContractByID(int contractID)
         {
@@ -80,5 +131,7 @@ namespace Algorithm
             _weight -= compleatedContract.TotalWeight;
             _waggonCount -= compleatedContract.WaggonCount;
         }
+
+        #endregion
     }
 }
