@@ -11,16 +11,23 @@ namespace ConsoleView
     {
         static void Main(string[] args)
         {
+            #region Cities
+
             World.AddCities(5);
+
+            #endregion
 
             #region Connections
 
             World.AddConnection(0, 1, 10);
+            World.AddConnection(0, 2, 14);
+            World.AddConnection(0, 3, 55);    
             World.AddConnection(0, 4, 40);
 
             World.AddConnection(1, 0, 10);
             World.AddConnection(1, 2, 20);
             World.AddConnection(1, 3, 30);
+            World.AddConnection(1, 4, 47);
 
             World.AddConnection(2, 1, 22);
             World.AddConnection(2, 3, 30);
@@ -56,12 +63,12 @@ namespace ConsoleView
             World.AddContractToCity(1, DelieveryContractFactory.CreateContract(4, 110, 10, 1011));
             World.AddContractToCity(1, DelieveryContractFactory.CreateContract(2, 220, 23, 2022));
 
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(3, 330, 44, 2242));
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(4, 320, 14, 1242));
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(3, 330, 44, 2242));
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(4, 320, 14, 1242));
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(3, 330, 44, 2242));
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(4, 320, 14, 1242));
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(1, 330, 44, 2242));
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(0, 320, 14, 1242));
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(0, 330, 44, 2242));
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(2, 320, 14, 1242));
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(2, 330, 44, 2242));
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(2, 320, 14, 1242));
 
             World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));
             World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));
@@ -93,8 +100,13 @@ namespace ConsoleView
             #region Algorythm parameters
 
             AlgorithmImplementation.MaxCityVisited = 4;
-            AlgorithmImplementation.Temperature = 20;
-            
+            AlgorithmImplementation.Seed = 3;
+
+            AlgorithmImplementation.MainLoopTemperature = 20;
+            AlgorithmImplementation.ContractLoopTemperature = 20;
+
+            AlgorithmImplementation.MainLoopAlpha = 0.8;
+            AlgorithmImplementation.ContractLoopAlpha = 0.8;
 
             #endregion
 
@@ -104,7 +116,7 @@ namespace ConsoleView
 
             AlgorithmImplementation.Solve();
 
-            #region Sandbox XDDD
+            #region Sandbox
 
             //List<int> lista = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 
@@ -123,21 +135,22 @@ namespace ConsoleView
 
         public static void ShowMatrix()
         {
+            Console.WriteLine("\n Adjacency matrix: ");
             for (int j = 0; j < World.Cities.Count; j++)
             {
-                Console.Write("[");
+                Console.Write("\t[");
                 for (int i = 0; i < World.Cities.Count; i++)
                 {
                     Console.Write(" " + World.CTCMatrix[j,i] + " ");
                 }
-                Console.WriteLine("]");
+                Console.Write("]\n");
             }
                 
         }
 
         public static void ShowContracts()
         {
-            Console.WriteLine("Contracts:");
+            Console.WriteLine("\n Contracts:");
 
             foreach(City city in World.Cities)
             {
@@ -158,12 +171,12 @@ namespace ConsoleView
 
         public static void ShowLocomotive()
         {
-            Console.WriteLine("Locomotive status:");
+            Console.WriteLine("\n Locomotive status:");
             Console.WriteLine("\t" + "Current location id: " + Locomotive.CurrentLocationID);
             Console.WriteLine("\t" + "Ultimate target location id: " + Locomotive.TargetLocationID);
             Console.WriteLine("\t" + "Cash: " + Locomotive.Cash);
 
-            Console.WriteLine("Signed contracts: ");
+            Console.WriteLine(" Signed contracts: ");
             foreach(DelieveryContract contract in Locomotive.DelieveryContracts)
             {
                 Console.WriteLine("\t" +
