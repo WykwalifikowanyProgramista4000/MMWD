@@ -27,7 +27,6 @@ namespace Algorithm
         private static bool _contractLoopAlphaSetFlag = false;
 
         private static double _bestSolutionValue = -1;
-        private static double _newSolutionValue;
 
         private static List<int> _citiesToVisitID = new List<int>() { Locomotive.CurrentLocationID };
         private static List<List<int>> _contractsToSignID = new List<List<int>>();
@@ -142,19 +141,45 @@ namespace Algorithm
         public static void Solve()
         {
             Stopwatch algorithmTimer = Stopwatch.StartNew();
+            double temperature = _mainLoopTemperature;
 
-            GenerateTemplateCitiesRouteSolution();
-            _contractsToSignID = FindBestContractsSet();
-            _newSolutionValue = CalculateSolutionValue(_contractsToSignID);
+            List<int> bestCityRoute = GenerateTemplateCityRoute();
+            List<int> newCityRoute;
 
-            while(_mainLoopTemperature > 0.001)
+            List<List<int>> bestContractSet = FindBestContractsSet(bestCityRoute);
+            List<List<int>> newContractSet;
+
+            double bestSolutionValue = CalculateSolutionValue(bestContractSet);
+            double newSolutionValue;
+
+            while(temperature > 0.001)
             {
+                newCityRoute = GenerateNextCityRoute(bestCityRoute);
+                newContractSet = FindBestContractsSet(newCityRoute);
+                newSolutionValue = CalculateSolutionValue(newContractSet);
 
+                if(newSolutionValue > bestSolutionValue)
+                {
+                    bestSolutionValue = newSolutionValue;
+                    bestContractSet = newContractSet;
+                    bestSolutionValue = newSolutionValue;
+                }
+                else if(_random.NextDouble() > Math.Pow(Math.E, (bestSolutionValue - newSolutionValue) / temperature))
+                {
+                    bestSolutionValue = newSolutionValue;
+                    bestContractSet = newContractSet;
+                    bestSolutionValue = newSolutionValue;
+                }
+
+                temperature *= _mainLoopAlpha;
             }
 
-            
+            _bestSolutionValue = bestSolutionValue;
+            _citiesToVisitID = bestCityRoute;
+            _contractsToSignID = bestContractSet;
 
             algorithmTimer.Stop();
+            Console.WriteLine("\nFinal solution value: " + _bestSolutionValue);
             Console.WriteLine("\nSolution took: " + algorithmTimer.ElapsedMilliseconds + " miliseconds");
         }
 
@@ -193,12 +218,13 @@ namespace Algorithm
 
         #region City specific steps
 
-        private static void GenerateTemplateCitiesRouteSolution()
+        private static List<int> GenerateTemplateCityRoute()
         {
-            while (_citiesToVisitID.Count <= _maxCityJumps)   // generating list of the cities to visit
+            List<int> templateCityRoute = new List<int>(_citiesToVisitID);
+            while (templateCityRoute.Count <= _maxCityJumps)   // generating list of the cities to visit
             {
                 List<int> availableConnections = new List<int>();   // temporary list to store available connections from the city in Locomotive current location
-                int locomotiveLocation = _citiesToVisitID[_citiesToVisitID.Count - 1];
+                int locomotiveLocation = templateCityRoute[templateCityRoute.Count - 1];
 
                 for (int i = 0; i < World.CTCMatrix.GetLength(0); i++)
                 {
@@ -209,16 +235,17 @@ namespace Algorithm
 
                 }
 
-                _citiesToVisitID.Add(availableConnections[_random.Next(0, availableConnections.Count - 1)]); // pseudorandomly adding next city to current solution
+                templateCityRoute.Add(availableConnections[_random.Next(0, availableConnections.Count - 1)]); // pseudorandomly adding next city to current solution
             }
 
-            Console.WriteLine("\n\n Cities to visit in first template solution: " + string.Join(", ", _citiesToVisitID.ToArray()));
+            Console.WriteLine("\n\n Cities to visit in first template solution: " + string.Join(", ", templateCityRoute.ToArray()));
+
+            return templateCityRoute;
         }
 
-        
-        private static List<int> GenerateNextCitiesRouteSolution()
+        private static List<int> GenerateNextCityRoute(List<int> cityRoute)
         {
-            List<int> newCitiesRoute = new List<int>(_citiesToVisitID);
+            List<int> newCitiesRoute = new List<int>(cityRoute);
             bool firstLoop = true;
 
             // we decide what city we want to swap. We will always change te next city hop, from city which index we randomly get
@@ -264,19 +291,19 @@ namespace Algorithm
 
         #region Contracts Signed specific steps
 
-        private static List<List<int>> FindBestContractsSet()
+        private static List<List<int>> FindBestContractsSet(List<int> cityRoute)
         {
             double temperature = _contractLoopTemperature;
             double bestValue = -1;
             double newValue;
-            GenerateTemplateContractsSignedSolution();  // first template solution
-            List<List<int>> bestContractsSet = new List<List<int>>(_contractsToSignID);
+            
+            List<List<int>> bestContractsSet = new List<List<int>>(GenerateTemplateContractSet(cityRoute));  // first template solution
             List<List<int>> newContractsSet = new List<List<int>>();
 
 
             while( temperature > 0.01)  // end statement
             {
-                newContractsSet = GenerateNextContractsSignedSolution();    // generating the neighbouring solution
+                newContractsSet = GenerateNextContractSet(bestContractsSet, cityRoute);    // generating the neighbouring solution
 
                 bestValue = CalculateSolutionValue(bestContractsSet);   // calculating the value for the currently best solution
                 newValue = CalculateSolutionValue(newContractsSet); // calculating the value of neighbouring solution
@@ -296,22 +323,23 @@ namespace Algorithm
             return bestContractsSet;
         }
 
-        private static void GenerateTemplateContractsSignedSolution()
+        private static List<List<int>> GenerateTemplateContractSet(List<int> cityRoute)
         {
+            List<List<int>> templateContractSet = new List<List<int>>();
             // generating lists of contracts that will be signed up in each city
-            for (int currentCityIndex = 0; currentCityIndex < _citiesToVisitID.Count; currentCityIndex++)   // iterating through cities to visit
+            for (int currentCityIndex = 0; currentCityIndex < cityRoute.Count; currentCityIndex++)   // iterating through cities to visit
             {
-                int cityToVisitID = _citiesToVisitID[currentCityIndex];
+                int cityToVisitID = cityRoute[currentCityIndex];
                 int contractsInCityCount = World.GetCityByID(cityToVisitID).DelieveryContracts.Count;
 
-                _contractsToSignID.Add(new List<int>());
+                templateContractSet.Add(new List<int>());
 
                 List<int> possibleContractsID = new List<int>();
 
                 foreach (DelieveryContract contract in World.GetCityByID(cityToVisitID).DelieveryContracts)  // iterating through the each city
                 {
-                    if (_citiesToVisitID.
-                        GetRange(currentCityIndex + 1, _citiesToVisitID.Count - currentCityIndex - 1).    //todo I feelike it might go out of bounds, but it does not >:[
+                    if (cityRoute.
+                        GetRange(currentCityIndex + 1, cityRoute.Count - currentCityIndex - 1).    //todo I feelike it might go out of bounds, but it does not >:[
                         Exists(cityID => cityID == contract.TargetCityID))    // generating the list of contracts that have their target city futher in the cities to visit list
                     {
                         possibleContractsID.Add(contract.ID);
@@ -325,23 +353,23 @@ namespace Algorithm
                     if (possibleContractsID.Count > 0)   // randomly choosing contract from available ones
                     {
                         int chosenContractIndex = _random.Next(0, possibleContractsID.Count - 1);
-                        _contractsToSignID[currentCityIndex].Add(possibleContractsID[chosenContractIndex]);
+                        templateContractSet[currentCityIndex].Add(possibleContractsID[chosenContractIndex]);
                         possibleContractsID.Remove(possibleContractsID[chosenContractIndex]);
                     }
                 }
-
             }
 
             Console.WriteLine("\n Chosen contracts:");
-            for (int i = 0; i < _citiesToVisitID.Count; i++)
+            for (int i = 0; i < cityRoute.Count; i++)
             {
-                Console.WriteLine("\tIn city: '" + _citiesToVisitID[i] + "' we take contracts with ID: " + string.Join(",", _contractsToSignID[i].ToArray()));
+                Console.WriteLine("\tIn city: '" + cityRoute[i] + "' we take contracts with ID: " + string.Join(",", templateContractSet[i].ToArray()));
             }
+            return templateContractSet;
         }
 
-        private static List<List<int>> GenerateNextContractsSignedSolution()
+        private static List<List<int>> GenerateNextContractSet(List<List<int>> contractSet, List<int> cityRoute)
         {
-            List<List<int>> newContractsSet = new List<List<int>>(_contractsToSignID);
+            List<List<int>> newContractsSet = new List<List<int>>(contractSet);
 
             #region Removing Contracts
             foreach (List<int> contractsList in newContractsSet) // we decide if we want ro remove any currently taken contracts
@@ -359,18 +387,18 @@ namespace Algorithm
             #region Adding Contracts
             List<int> contrIMightWntToTake = new List<int>();
 
-            for (int i=0; i < _citiesToVisitID.Count; i++) // przechodzimy przez wszystkie miasta w wektorze
+            for (int i=0; i < cityRoute.Count; i++) // przechodzimy przez wszystkie miasta w wektorze
             {
                 contrIMightWntToTake = new List<int>();
 
-                foreach (DelieveryContract contract in World.GetCityByID(_citiesToVisitID[i]).DelieveryContracts) // przechodzimy przez wszystkie contrakty w każdym mieście
+                foreach (DelieveryContract contract in World.GetCityByID(cityRoute[i]).DelieveryContracts) // przechodzimy przez wszystkie contrakty w każdym mieście
                 {
                     if(newContractsSet[i].Count < 1) { continue; }
                     if(newContractsSet[i].Exists(id => id == contract.ID)) // sprawdzamy czy kontrakt jest już podpisany w rozwiązaniu
                     {
                         continue; // jeśli tak to sprawdzamy kolejny kappa
                     }
-                    else if(_citiesToVisitID.FindIndex(cityId => cityId == contract.TargetCityID) > i) // sprawdzamy czy dla tego kontraktu będziemy przejeżdżali w kolejnych krokach przez jego miasto docelowe
+                    else if(cityRoute.FindIndex(cityId => cityId == contract.TargetCityID) > i) // sprawdzamy czy dla tego kontraktu będziemy przejeżdżali w kolejnych krokach przez jego miasto docelowe
                     {
                         contrIMightWntToTake.Add(contract.ID); // jeśli nie jest już na liście i będziemy w kolejnych krokach przejeżdżali przez target city to dodajemy do listy potencalnych kontraktów
                     }
