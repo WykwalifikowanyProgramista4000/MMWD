@@ -22,6 +22,7 @@ namespace Algorithm
 
         private static List<DelieveryContract> _delieveryContracts = new List<DelieveryContract>();
 
+        private static int _startLocationID;
         private static int _currentLocationID;
 
         private static int _targetLocationID;
@@ -92,6 +93,12 @@ namespace Algorithm
             {
                 
             }
+        }
+
+        public static int StartLocationID
+        {
+            get { return _startLocationID; }
+            set { _startLocationID = value; }
         }
 
         public static int CurrentLocationID

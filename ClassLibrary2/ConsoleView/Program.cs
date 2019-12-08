@@ -105,8 +105,8 @@ namespace ConsoleView
             AlgorithmImplementation.MainLoopTemperature = 20;
             AlgorithmImplementation.ContractLoopTemperature = 20;
 
-            AlgorithmImplementation.MainLoopAlpha = 0.8;
-            AlgorithmImplementation.ContractLoopAlpha = 0.8;
+            AlgorithmImplementation.MainLoopAlpha = 0.98;
+            AlgorithmImplementation.ContractLoopAlpha = 0.98;
 
             #endregion
 
@@ -118,17 +118,14 @@ namespace ConsoleView
 
             #region Sandbox
 
-            //List<int> lista = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+            //List<KeyValuePair<int, double>> somekindofnigger = new List<KeyValuePair<int, double>>() { new KeyValuePair<int, double>(1, 12.3) };
 
-            //int someIndex = 3;
+            //Console.WriteLine("\nklucz: " + somekindofnigger[0].Key + ", wartość: " + somekindofnigger[0].Value);
 
-            //string hehe = string.Join(", ", lista.GetRange(someIndex + 1, lista.Count-someIndex-1).ToArray());
 
-            //Console.WriteLine("\n\nElemenciory" + hehe);
+        #endregion
 
-            #endregion
-
-            Console.ReadLine();
+        Console.ReadLine();
         }
 
         #region Methods

@@ -12,6 +12,7 @@ namespace Algorithm
 
         private readonly int _id;
         private List<DelieveryContract> _delieveryContracts = new List<DelieveryContract>();
+        private List<KeyValuePair<int, double>> _connections = new List<KeyValuePair<int, double>>();
 
         #endregion 
 
@@ -36,6 +37,10 @@ namespace Algorithm
             get { return _delieveryContracts; }
         }
 
+        public List<KeyValuePair<int, double>> Connections
+        {
+            get { return _connections; }
+        }
         #endregion
 
         #region Public Methods
@@ -54,6 +59,11 @@ namespace Algorithm
             }
 
             _delieveryContracts.Add(delieveryContract);
+        }
+
+        public void AddConnection(int destinationCityID, double distance)
+        {
+            _connections.Add(new KeyValuePair<int, double>(destinationCityID, distance));
         }
 
         public void RemoveDelieveryContract(int contractID)

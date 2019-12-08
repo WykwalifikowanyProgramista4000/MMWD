@@ -60,6 +60,7 @@ namespace Algorithm
             else
             {
                 _distanceCityToCityMatrix[sourceCityID, targetCityID] = distance;
+                GetCityByID(sourceCityID).AddConnection(targetCityID, distance);
             }
         }
 

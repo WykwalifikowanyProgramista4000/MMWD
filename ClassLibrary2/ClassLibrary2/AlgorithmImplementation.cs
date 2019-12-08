@@ -28,7 +28,7 @@ namespace Algorithm
 
         private static double _bestSolutionValue = -1;
 
-        private static List<int> _citiesToVisitID = new List<int>() { Locomotive.CurrentLocationID };
+        private static List<int> _citiesToVisitID = new List<int>();
         private static List<List<int>> _contractsToSignID = new List<List<int>>();
 
         private static Random _random = new Random();
@@ -216,26 +216,34 @@ namespace Algorithm
             return list;
         }
 
+        public static T Last<T>(this IList<T> lst)
+        {
+                return lst[lst.Count - 1];
+        }
+
+        public static int LastIndex<T>(this IList<T> lst)
+        {   
+            if(lst.Count > 0)
+            {
+                return lst.Count - 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
         #region City specific steps
 
         private static List<int> GenerateTemplateCityRoute()
         {
-            List<int> templateCityRoute = new List<int>(_citiesToVisitID);
+            List<int> templateCityRoute = new List<int>() { Locomotive.StartLocationID };
             while (templateCityRoute.Count <= _maxCityJumps)   // generating list of the cities to visit
             {
-                List<int> availableConnections = new List<int>();   // temporary list to store available connections from the city in Locomotive current location
-                int locomotiveLocation = templateCityRoute[templateCityRoute.Count - 1];
+                Locomotive.CurrentLocationID = templateCityRoute.Last();
+                City currentCity = World.Cities[Locomotive.CurrentLocationID];
 
-                for (int i = 0; i < World.CTCMatrix.GetLength(0); i++)
-                {
-                    if (!Double.IsNaN(World.CTCMatrix[locomotiveLocation, i]))
-                    {
-                        availableConnections.Add(i);
-                    }
-
-                }
-
-                templateCityRoute.Add(availableConnections[_random.Next(0, availableConnections.Count - 1)]); // pseudorandomly adding next city to current solution
+                templateCityRoute.Add(currentCity.Connections[_random.Next(0, currentCity.Connections.LastIndex())].Key); // pseudorandomly adding next city to current solution
             }
 
             Console.WriteLine("\n\n Cities to visit in first template solution: " + string.Join(", ", templateCityRoute.ToArray()));
@@ -250,37 +258,29 @@ namespace Algorithm
 
             // we decide what city we want to swap. We will always change te next city hop, from city which index we randomly get
             // after the first loop, we will prioritize not changeing the currently established root, and not changeing the next hopcity if possible
-            for (int cityToSwapIndex = _random.Next(0, newCitiesRoute.Count - 2); cityToSwapIndex < newCitiesRoute.Count - 2; cityToSwapIndex++) // we do it for the each remaining city in the loop
+            for (int cityToSwapIndex = _random.Next(0, newCitiesRoute.LastIndex() - 1); cityToSwapIndex < newCitiesRoute.LastIndex(); cityToSwapIndex++) // we do it for the each remaining city in the loop
             {
-                List<int> availableHops = new List<int>();
-
-                for (int nextHopCityID = 0; nextHopCityID < World.CTCMatrix.GetLength(0); nextHopCityID++) // robimy listę kolejnych miast do których możemy sobie skoczyć
-                {
-                    if (Double.IsNaN(World.CTCMatrix[newCitiesRoute[cityToSwapIndex], nextHopCityID]) == false)
-                    {
-                        availableHops.Add(nextHopCityID);
-                    }
-                }
+                City currentCity = World.GetCityByID(newCitiesRoute[cityToSwapIndex]);
 
                 if(firstLoop == false)   // sprawdzamy czy jest to pierwsza pętla, ponieważ w niej priorytet ma zmiana
                 {
-                    if(availableHops.Exists(id => id == newCitiesRoute[cityToSwapIndex + 1]))   // jeśli nie pierwsza to sprawdzamy czy w liście dostępnych następnych skoków znajduje się to samo miasto co na odpowiadającym indeksie w obecnej trasie
+                    if(currentCity.Connections.Exists(connection => connection.Key == newCitiesRoute[cityToSwapIndex + 1]))   // jeśli nie pierwsza to sprawdzamy czy w liście dostępnych następnych skoków znajduje się to samo miasto co na odpowiadającym indeksie w obecnej trasie
                     {
                         continue;
                     }
                 }
 
-                int nextHopIndex = _random.Next(0, availableHops.Count - 1);    // z listy następnych skoków wybieramy jeden
+                int nextHopIndex = _random.Next(0, currentCity.Connections.LastIndex());    // z listy następnych skoków wybieramy jeden
 
-                if (availableHops.Count > 1) // jeśli jest więcej niż 1 możliwy wybór to losujemy tak długo aż uda nam się w końcu zmienić na nowy :)
+                if (currentCity.Connections.Count > 1) // jeśli jest więcej niż 1 możliwy wybór to losujemy tak długo aż uda nam się w końcu zmienić na nowy :)
                 {
-                    while (availableHops[nextHopIndex] == newCitiesRoute[cityToSwapIndex + 1])
+                    while (currentCity.Connections[nextHopIndex].Key == newCitiesRoute[cityToSwapIndex + 1])
                     {
-                        nextHopIndex = _random.Next(0, availableHops.Count - 1);
+                        nextHopIndex = _random.Next(0, currentCity.Connections.LastIndex());
                     }
                 }
 
-                newCitiesRoute[cityToSwapIndex + 1] = availableHops[nextHopIndex];  // ustawiamy nowe miasto jako kolejne
+                newCitiesRoute[cityToSwapIndex + 1] = currentCity.Connections[nextHopIndex].Key;  // ustawiamy nowe miasto jako kolejne
                 firstLoop = false;
             }
 
