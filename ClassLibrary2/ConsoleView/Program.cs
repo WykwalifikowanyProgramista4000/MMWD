@@ -44,47 +44,47 @@ namespace ConsoleView
 
             #region Contracts
 
-            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(1, 100, 10, 1000));
-            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(2, 200, 20, 2000));
-            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(3, 300, 30, 3000));
-            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(1, 100, 10, 1000));
-            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(2, 200, 20, 2000));
-            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(3, 300, 30, 3000));
-            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(1, 100, 10, 1000));
-            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(2, 200, 20, 2000));
-            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(3, 300, 30, 3000));
+            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(1, 100, 10, 1000));  // 0
+            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(2, 100, 20, 2000));  // 1
+            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(3, 100, 30, 3000));  // 2
+            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(1, 100, 10, 1000));  // 3
+            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(2, 100, 20, 2000));  // 4
+            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(3, 300, 30, 3000));  // 5
+            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(1, 100, 10, 1000));  // 6
+            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(2, 100, 20, 2000));  // 7
+            World.AddContractToCity(0, DelieveryContractFactory.CreateContract(3, 300, 30, 3000));  // 8
 
-            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(4, 110, 10, 1011));
-            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(2, 220, 23, 2022));
-            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(4, 110, 10, 1011));
-            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(2, 220, 23, 2022));
-            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(4, 110, 10, 1011));
-            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(2, 220, 23, 2022));
-            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(4, 110, 10, 1011));
-            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(2, 220, 23, 2022));
+            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(4, 110, 10, 1011));  // 9
+            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(2, 220, 23, 2022));  // 10
+            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(4, 110, 10, 1011));  // 11
+            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(2, 100, 23, 2022));  // 12
+            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(4, 110, 10, 1011));  // 13
+            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(2, 100, 23, 2022));  // 14
+            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(4, 110, 10, 1011));  // 15
+            World.AddContractToCity(1, DelieveryContractFactory.CreateContract(2, 220, 23, 2022));  // 16
 
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(1, 330, 44, 2242));
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(0, 320, 14, 1242));
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(0, 330, 44, 2242));
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(2, 320, 14, 1242));
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(2, 330, 44, 2242));
-            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(2, 320, 14, 1242));
-
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));
-            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));
-
-            World.AddContractToCity(4, DelieveryContractFactory.CreateContract(0, 242, 15, 9349));
-            World.AddContractToCity(4, DelieveryContractFactory.CreateContract(2, 782, 73, 9949));
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(1, 330, 44, 2242));  // 17
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(0, 320, 14, 1242));  // 18 
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(0, 330, 44, 2242));  // 19
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(2, 320, 14, 1242));  // 20
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(2, 330, 44, 2242));  // 21
+            World.AddContractToCity(2, DelieveryContractFactory.CreateContract(2, 320, 14, 1242));  // 22
+                                                                                                       
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));  // 23
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));  // 24
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));  // 25
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));  // 26
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));  // 27
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));  // 28
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));  // 29
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(4, 222, 12, 1234));  // 30
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));  // 31
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));  // 32
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));  // 33
+            World.AddContractToCity(3, DelieveryContractFactory.CreateContract(2, 212, 33, 1554));  // 34
+                                                                                                       
+            World.AddContractToCity(4, DelieveryContractFactory.CreateContract(0, 242, 15, 9349));  // 35
+            World.AddContractToCity(4, DelieveryContractFactory.CreateContract(2, 782, 73, 9949));  // 36
 
             #endregion
 
@@ -93,7 +93,8 @@ namespace ConsoleView
             Locomotive.TargetLocationID = 4;
             Locomotive.CurrentLocationID = 0;
 
-            Locomotive.SignContractByID(0);
+            Locomotive.MaxWeight = 15_000;
+            Locomotive.MaxWaggonCount = 112;
 
             #endregion
 
@@ -105,8 +106,8 @@ namespace ConsoleView
             AlgorithmImplementation.MainLoopTemperature = 20;
             AlgorithmImplementation.ContractLoopTemperature = 20;
 
-            AlgorithmImplementation.MainLoopAlpha = 0.98;
-            AlgorithmImplementation.ContractLoopAlpha = 0.98;
+            AlgorithmImplementation.MainLoopAlpha = 0.8;
+            AlgorithmImplementation.ContractLoopAlpha = 0.8;
 
             #endregion
 
@@ -174,15 +175,7 @@ namespace ConsoleView
             Console.WriteLine("\t" + "Cash: " + Locomotive.Cash);
 
             Console.WriteLine(" Signed contracts: ");
-            foreach(DelieveryContract contract in Locomotive.DelieveryContracts)
-            {
-                Console.WriteLine("\t" +
-                    "ID: " + contract.ID +
-                    ", target city: " + contract.TargetCityID +
-                    ", payment: " + contract.Payment +
-                    ", waggon count: " + contract.WaggonCount +
-                    ", total delievery weight: " + contract.TotalWeight);
-            }
+
 
         }
 

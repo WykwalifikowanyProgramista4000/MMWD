@@ -6,6 +6,18 @@ using System.Threading.Tasks;
 
 namespace Algorithm
 {
+    public struct Status
+    {
+        public double Weight { get; set; }
+        public int WaggonCount;
+
+        public Status(double weight, int waggonCount)
+        {
+            Weight = weight;
+            WaggonCount = waggonCount;
+        }
+    }
+
     public static class Locomotive
     {
         #region Parameters
@@ -20,9 +32,12 @@ namespace Algorithm
         private static int _maxWaggonCount;
         private static bool _maxWaggonCountSetFlag = false;
 
-        private static List<DelieveryContract> _delieveryContracts = new List<DelieveryContract>();
+        private static List<List<DelieveryContract>> _flowingContractsList = new List<List<DelieveryContract>>();
+        private static List<Status> _flowingStatus = new List<Status>();
 
-        private static int _startLocationID;
+        private static List<int> _compleatedContractsIDs = new List<int>();
+
+        private static int _startLocationID;    //todo add setflag
         private static int _currentLocationID;
 
         private static int _targetLocationID;
@@ -37,7 +52,6 @@ namespace Algorithm
         {
             get { return _cash; }
         }
-
         public static double Weight
         {
             get { return _weight; }
@@ -58,7 +72,6 @@ namespace Algorithm
                 }
             }
         }
-
         public static int WaggonCount
         {
             get { return _waggonCount; }
@@ -69,7 +82,7 @@ namespace Algorithm
             get { return _maxWaggonCount; }
             set
             {
-                if(_maxWaggonCountSetFlag == false)
+                if (_maxWaggonCountSetFlag == false)
                 {
                     _maxWaggonCount = value;
                     _maxWaggonCountSetFlag = true;
@@ -81,11 +94,22 @@ namespace Algorithm
             }
         }
 
-        public static List<DelieveryContract> DelieveryContracts
+        public static List<List<DelieveryContract>> FlowingContractsList
         {
-            get { return _delieveryContracts; }
+            get { return _flowingContractsList; }
+            set { _flowingContractsList = value; }
         }
-
+        public static List<Status> FlowingStatusList
+        {
+            get { return _flowingStatus; }
+            set { _flowingStatus = value; }
+        }
+        public static List<int> CompleatedContractsIDs
+        {
+            get { return _compleatedContractsIDs; }
+            set { _compleatedContractsIDs = value; }
+        }
+        
         public static int TargetLocationID
         {
             get { return _targetLocationID; }
@@ -111,32 +135,87 @@ namespace Algorithm
 
         #region Methods
 
-        public static DelieveryContract GetDelieveryContractByID(int contractID)
+        public static void SignContract(DelieveryContract contract, int cityIndex)
         {
-            return _delieveryContracts.Find(contract => contract.ID == contractID);
+            _flowingContractsList[cityIndex].Add(contract);
+
+            FlowingStatusList[cityIndex] = new Status(_flowingStatus[cityIndex].Weight + contract.TotalWeight,
+                                                      _flowingStatus[cityIndex].WaggonCount + contract.WaggonCount);
         }
 
-
-        public static void SignContractByID(int contractID)
+        public static void CompleateContractsInCityIndex(int cityIndex, int cityID)
         {
-            DelieveryContract signedContract = World.GetCityByID(CurrentLocationID).DelieveryContracts.Find(contract => contract.ID == contractID);
-            _delieveryContracts.Add(signedContract);
+            if(FlowingContractsList.Count < 1) { return; }
+            List<DelieveryContract> contractsToRemove = new List<DelieveryContract>();
+            foreach(DelieveryContract contract in FlowingContractsList[cityIndex])
+            {
+                if(contract.TargetCityID == cityID)
+                {
+                    _compleatedContractsIDs.Add(contract.ID);
+                    contractsToRemove.Add(contract);
+                }
+            }
 
-            World.GetCityByID(CurrentLocationID).RemoveDelieveryContract(contractID);
-            
-            _weight += signedContract.TotalWeight;
-            _waggonCount += signedContract.WaggonCount;
+            foreach( DelieveryContract contractToRemove in contractsToRemove)
+            {
+                FlowingContractsList[cityIndex].Remove(contractToRemove);
+            }
+            EvalStatusList();
         }
 
-        public static void CompleateContractByID(int contractID)
+        public static void EvalStatusList()
         {
-            DelieveryContract compleatedContract = _delieveryContracts.Find(contract => contract.ID == contractID);
-            _delieveryContracts.Remove(GetDelieveryContractByID(contractID));
+            double weight;
+            int waggonCount;
 
-            _cash += compleatedContract.Payment;
+            for( int cityIndex = 0; cityIndex <= _flowingContractsList.LastIndex(); cityIndex++)
+            {
+                weight = 0;
+                waggonCount = 0;
 
-            _weight -= compleatedContract.TotalWeight;
-            _waggonCount -= compleatedContract.WaggonCount;
+                foreach(DelieveryContract contract in _flowingContractsList[cityIndex])
+                {
+                    weight += contract.TotalWeight;
+                    waggonCount += contract.WaggonCount;
+                }
+
+                FlowingStatusList[cityIndex] = new Status(weight, waggonCount);
+            }
+        }
+
+        public static void EvalCash()
+        {
+            _cash = 0;
+
+            foreach(int contractID in _compleatedContractsIDs)
+            {
+                _cash += World.Contracts.Find(contract => contract.ID == contractID).Payment;
+            }
+        }
+        
+        public static void ShowFlowingContractsList()
+        {
+            for (int cityIndex = 0; cityIndex <= FlowingContractsList.LastIndex(); cityIndex++)
+            {
+                Console.Write("\nIn CityIndex: " + cityIndex + "  we have: ");
+
+                foreach( DelieveryContract contract in FlowingContractsList[cityIndex])
+                {
+                    Console.Write(contract.ID + ", ");
+                }
+            }
+            Console.Write("\n");
+        }
+
+        public static void MoveContractsForward(int currnetCityIndex)
+        {
+            foreach(DelieveryContract contract in FlowingContractsList[currnetCityIndex])
+            {
+                if (FlowingContractsList[currnetCityIndex + 1].Exists(possibleTwin => possibleTwin.ID == contract.ID) == false)
+                {
+                    FlowingContractsList[currnetCityIndex + 1].Add(contract);
+                }
+            }
         }
 
         #endregion

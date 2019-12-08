@@ -11,6 +11,7 @@ namespace Algorithm
         #region Params
 
         private static List<City> _cities = new List<City>();
+        private static List<DelieveryContract> _contracts = new List<DelieveryContract>();
 
         private static double[,] _distanceCityToCityMatrix = new double[1, 1] { { Double.NaN } };
 
@@ -23,6 +24,11 @@ namespace Algorithm
             get { return _cities; }
         }
         
+        public static List<DelieveryContract> Contracts
+        {
+            get { return _contracts; }
+        }
+
         public static double[,] CTCMatrix
         {
             get { return _distanceCityToCityMatrix; }
@@ -73,6 +79,7 @@ namespace Algorithm
             }
 
             _cities.Find(city => city.ID == sourceCityID).AddDelieveryContract(delieveryContract);
+            _contracts.Add(delieveryContract);
         }
 
         public static void RemoveContractFromCityByID(int cityID, int contractID)
