@@ -138,6 +138,8 @@ namespace Algorithm
 
         #region Methods
 
+        #region Main Solve
+
         public static void Solve()
         {
             Stopwatch algorithmTimer = Stopwatch.StartNew();
@@ -192,6 +194,9 @@ namespace Algorithm
             Console.WriteLine("\nSolution took: " + algorithmTimer.ElapsedMilliseconds + " miliseconds");
         }
 
+        #endregion
+
+        #region Utilities
 
         private static double CalculateSolutionValue(List<List<int>> solution)
         {
@@ -243,6 +248,8 @@ namespace Algorithm
                 return -1;
             }
         }
+
+        #endregion
 
         #region City specific steps
 
@@ -341,8 +348,8 @@ namespace Algorithm
             #region Reseting lists
 
             List<List<int>> templateContractSet = new List<List<int>>();
-            Locomotive.CompleatedContractsIDs = new List<int>();
 
+            Locomotive.CompleatedContractsIDs = new List<int>();
             Locomotive.FlowingContractsList = new List<List<DelieveryContract>>();
             Locomotive.FlowingStatusList = new List<Status>();
 
@@ -416,6 +423,7 @@ namespace Algorithm
         private static List<List<int>> GenerateNextContractSet(List<List<int>> contractSet, List<int> cityRoute)
         {
             List<List<int>> newContractsSet = new List<List<int>>(contractSet);
+            Locomotive.CompleatedContractsIDs = new List<int>();
 
             #region Removing Contracts
 

@@ -8,7 +8,7 @@ namespace Algorithm
 {
     public struct Status
     {
-        public double Weight { get; set; }
+        public double Weight;
         public int WaggonCount;
 
         public Status(double weight, int waggonCount)
@@ -32,10 +32,13 @@ namespace Algorithm
         private static int _maxWaggonCount;
         private static bool _maxWaggonCountSetFlag = false;
 
-        private static List<List<DelieveryContract>> _flowingContractsList = new List<List<DelieveryContract>>();
-        private static List<Status> _flowingStatus = new List<Status>();
+        private static List<List<DelieveryContract>> _bestFlowingContractsList = new List<List<DelieveryContract>>();
+        private static List<Status> _bestFlowingStatus = new List<Status>();
+        private static List<int> _bestCompleatedContractsIDs = new List<int>();
 
-        private static List<int> _compleatedContractsIDs = new List<int>();
+        private static List<List<DelieveryContract>> _newFlowingContractsList = new List<List<DelieveryContract>>();
+        private static List<Status> _newFlowingStatus = new List<Status>();
+        private static List<int> _newCompleatedContractsIDs = new List<int>();
 
         private static int _startLocationID;    //todo add setflag
         private static int _currentLocationID;
@@ -96,18 +99,18 @@ namespace Algorithm
 
         public static List<List<DelieveryContract>> FlowingContractsList
         {
-            get { return _flowingContractsList; }
-            set { _flowingContractsList = value; }
+            get { return _bestFlowingContractsList; }
+            set { _bestFlowingContractsList = value; }
         }
         public static List<Status> FlowingStatusList
         {
-            get { return _flowingStatus; }
-            set { _flowingStatus = value; }
+            get { return _bestFlowingStatus; }
+            set { _bestFlowingStatus = value; }
         }
         public static List<int> CompleatedContractsIDs
         {
-            get { return _compleatedContractsIDs; }
-            set { _compleatedContractsIDs = value; }
+            get { return _bestCompleatedContractsIDs; }
+            set { _bestCompleatedContractsIDs = value; }
         }
         
         public static int TargetLocationID
@@ -137,10 +140,10 @@ namespace Algorithm
 
         public static void SignContract(DelieveryContract contract, int cityIndex)
         {
-            _flowingContractsList[cityIndex].Add(contract);
+            _bestFlowingContractsList[cityIndex].Add(contract);
 
-            FlowingStatusList[cityIndex] = new Status(_flowingStatus[cityIndex].Weight + contract.TotalWeight,
-                                                      _flowingStatus[cityIndex].WaggonCount + contract.WaggonCount);
+            FlowingStatusList[cityIndex] = new Status(_bestFlowingStatus[cityIndex].Weight + contract.TotalWeight,
+                                                      _bestFlowingStatus[cityIndex].WaggonCount + contract.WaggonCount);
         }
 
         public static void CompleateContractsInCityIndex(int cityIndex, int cityID)
@@ -151,7 +154,7 @@ namespace Algorithm
             {
                 if(contract.TargetCityID == cityID)
                 {
-                    _compleatedContractsIDs.Add(contract.ID);
+                    _bestCompleatedContractsIDs.Add(contract.ID);
                     contractsToRemove.Add(contract);
                 }
             }
@@ -168,12 +171,12 @@ namespace Algorithm
             double weight;
             int waggonCount;
 
-            for( int cityIndex = 0; cityIndex <= _flowingContractsList.LastIndex(); cityIndex++)
+            for( int cityIndex = 0; cityIndex <= _bestFlowingContractsList.LastIndex(); cityIndex++)
             {
                 weight = 0;
                 waggonCount = 0;
 
-                foreach(DelieveryContract contract in _flowingContractsList[cityIndex])
+                foreach(DelieveryContract contract in _bestFlowingContractsList[cityIndex])
                 {
                     weight += contract.TotalWeight;
                     waggonCount += contract.WaggonCount;
@@ -187,7 +190,7 @@ namespace Algorithm
         {
             _cash = 0;
 
-            foreach(int contractID in _compleatedContractsIDs)
+            foreach(int contractID in _bestCompleatedContractsIDs)
             {
                 _cash += World.Contracts.Find(contract => contract.ID == contractID).Payment;
             }
