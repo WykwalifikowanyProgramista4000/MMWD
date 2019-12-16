@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Algorithm;
+using Algorithm.DataIO;
 
 namespace ConsoleView
 {
@@ -90,7 +91,6 @@ namespace ConsoleView
 
             #region Locomotive start parameters
 
-            Locomotive.TargetLocationID = 4;
             Locomotive.CurrentLocationID = 0;
 
             Locomotive.MaxWeight = 15_000;
@@ -98,16 +98,22 @@ namespace ConsoleView
 
             #endregion
 
+            #region Data output 
+
+            DataOutput.OutputPath = "C:\\Users\\wojte\\Documents\\dupa.txt";
+
+            #endregion
+
             #region Algorythm parameters
 
             AlgorithmImplementation.MaxCityVisited = 4;
-            AlgorithmImplementation.Seed = 3;
+            AlgorithmImplementation.Seed = 69;
 
-            AlgorithmImplementation.MainLoopTemperature = 20;
-            AlgorithmImplementation.ContractLoopTemperature = 20;
+            AlgorithmImplementation.MainLoopTemperature = 100;
+            AlgorithmImplementation.ContractLoopTemperature = 100;
 
-            AlgorithmImplementation.MainLoopAlpha = 0.8;
-            AlgorithmImplementation.ContractLoopAlpha = 0.8;
+            AlgorithmImplementation.MainLoopAlpha = 0.98;
+            AlgorithmImplementation.ContractLoopAlpha = 0.98;
 
             #endregion
 
@@ -173,8 +179,7 @@ namespace ConsoleView
         {
             Console.WriteLine("\n Locomotive status:");
             Console.WriteLine("\t" + "Current location id: " + Locomotive.CurrentLocationID);
-            Console.WriteLine("\t" + "Ultimate target location id: " + Locomotive.TargetLocationID);
-            Console.WriteLine("\t" + "Cash: " + Locomotive.Cash);
+            Console.WriteLine("\t" + "Cash: " + Locomotive.NewCash);
 
             Console.WriteLine(" Signed contracts: ");
 

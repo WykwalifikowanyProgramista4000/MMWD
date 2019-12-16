@@ -22,12 +22,18 @@ namespace Algorithm.DataIO
 
         #endregion // Get/Set
 
-        public static void SaveData(string dataString)
+        #region Methods
+
+        public static void SaveData(double temperature, double currentValue, double currentBestValue)
         {
+            _line = String.Format("{0};{1};{2};", temperature.ToString("F"), currentValue, currentBestValue);
+
             using (_streamWriter = new System.IO.StreamWriter(OutputPath, true))
             {
                 _streamWriter.WriteLine(_line);
             }
         }
+
+        #endregion //Methods
     }
 }

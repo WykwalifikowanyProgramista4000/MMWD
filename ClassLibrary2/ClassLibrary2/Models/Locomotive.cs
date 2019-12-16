@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Algorithm
 {
+    public enum SolutionType
+    {
+        New,
+        Better,
+        TheBest
+    }
+
     public struct Status
     {
         public double Weight;
@@ -22,49 +26,43 @@ namespace Algorithm
     {
         #region Parameters
 
-        private static double _cash;
-
-        private static double _weight;
         private static double _maxWeight;
         private static bool _maxWeightSetFlag = false;
 
-        private static int _waggonCount;
         private static int _maxWaggonCount;
         private static bool _maxWaggonCountSetFlag = false;
 
-        private static List<List<DelieveryContract>> _bestFlowingContractsList = new List<List<DelieveryContract>>();
-        private static List<Status> _bestFlowingStatus = new List<Status>();
-        private static List<int> _bestCompleatedContractsIDs = new List<int>();
+        private static List<int> _theBestCityRoute = new List<int>();
+        private static List<List<DelieveryContract>> _theBestFlowingContractsList = new List<List<DelieveryContract>>();
+        private static List<Status> _theBestFlowingStatus = new List<Status>();
+        private static List<int> _theBestCompleatedContractsIDs = new List<int>();
+        private static double _theBestCash = 0;
 
+        //private static List<int> _betterCityRoute = new List<int>();
+        private static List<List<DelieveryContract>> _betterFlowingContractsList = new List<List<DelieveryContract>>();
+        private static List<Status> _betterFlowingStatus = new List<Status>();
+        private static List<int> _betterCompleatedContractsIDs = new List<int>();
+        private static double _betterCash = 0;
+
+        private static List<int> _newCityRoute = new List<int>();
         private static List<List<DelieveryContract>> _newFlowingContractsList = new List<List<DelieveryContract>>();
-        private static List<Status> _newFlowingStatus = new List<Status>();
+        private static List<Status> _newFlowingStatusList = new List<Status>();
         private static List<int> _newCompleatedContractsIDs = new List<int>();
+        private static double _newCash = 0;
 
         private static int _startLocationID;    //todo add setflag
         private static int _currentLocationID;
-
-        private static int _targetLocationID;
-        private static bool _targetLocationSetFlag = false;
-
 
         #endregion
 
         #region Get/Set
 
-        public static double Cash
-        {
-            get { return _cash; }
-        }
-        public static double Weight
-        {
-            get { return _weight; }
-        }
         public static double MaxWeight
         {
             get { return _maxWeight; }
             set
             {
-                if (_maxWaggonCountSetFlag == false)
+                if (_maxWeightSetFlag == false)
                 {
                     _maxWeight = value;
                     _maxWeightSetFlag = true;
@@ -74,11 +72,6 @@ namespace Algorithm
                     Console.WriteLine("Max weight has been already set to '" + _maxWeight + "' and cannot be set to '" + value + "'");
                 }
             }
-        }
-        public static int WaggonCount
-        {
-            get { return _waggonCount; }
-
         }
         public static int MaxWaggonCount
         {
@@ -97,29 +90,77 @@ namespace Algorithm
             }
         }
 
-        public static List<List<DelieveryContract>> FlowingContractsList
+        public static List<int> TheBestCityRoute
         {
-            get { return _bestFlowingContractsList; }
-            set { _bestFlowingContractsList = value; }
+            get { return _theBestCityRoute; }
+            set { _theBestCityRoute = value; }
         }
-        public static List<Status> FlowingStatusList
+        public static List<List<DelieveryContract>> TheBestFlowingContractsList
         {
-            get { return _bestFlowingStatus; }
-            set { _bestFlowingStatus = value; }
+            get { return _theBestFlowingContractsList; }
+            set { _theBestFlowingContractsList = value; }
         }
-        public static List<int> CompleatedContractsIDs
+        public static List<Status> TheBestFlowingStatusList
         {
-            get { return _bestCompleatedContractsIDs; }
-            set { _bestCompleatedContractsIDs = value; }
+            get { return _theBestFlowingStatus; }
+            set { _theBestFlowingStatus = value; }
         }
-        
-        public static int TargetLocationID
+        public static List<int> TheBestCompleatedContractsIDs
         {
-            get { return _targetLocationID; }
-            set
-            {
-                
-            }
+            get { return _theBestCompleatedContractsIDs; }
+            set { _theBestCompleatedContractsIDs = value; }
+        }
+        public static double TheBestCash
+        {
+            get { return _theBestCash; }
+            set { _theBestCash = value; }
+        }
+
+        public static List<List<DelieveryContract>> BetterFlowingContractsList
+        {
+            get { return _betterFlowingContractsList; }
+            set { _betterFlowingContractsList = value; }
+        }
+        public static List<Status> BetterFlowingStatusList
+        {
+            get { return _betterFlowingStatus; }
+            set { _betterFlowingStatus = value; }
+        }
+        public static List<int> BetterCompleatedContractsIDs
+        {
+            get { return _betterCompleatedContractsIDs; }
+            set { _betterCompleatedContractsIDs = value; }
+        }
+        public static double BetterCash
+        {
+            get { return _betterCash; }
+            set { _betterCash = value; }
+        }
+
+        public static List<int> NewCityRoute
+        {
+            get { return _newCityRoute; }
+            set { _newCityRoute = value; }
+        }
+        public static List<List<DelieveryContract>> NewFlowingContractsList
+        {
+            get { return _newFlowingContractsList; }
+            set { _newFlowingContractsList = value; }
+        }
+        public static List<Status> NewFlowingStatusList
+        {
+            get { return _newFlowingStatusList; }
+            set { _newFlowingStatusList = value; }
+        }
+        public static List<int> NewCompleatedContractsIDs
+        {
+            get { return _newCompleatedContractsIDs; }
+            set { _newCompleatedContractsIDs = value; }
+        }
+        public static double NewCash
+        {
+            get { return _newCash; }
+            set { _newCash = value; }
         }
 
         public static int StartLocationID
@@ -140,28 +181,28 @@ namespace Algorithm
 
         public static void SignContract(DelieveryContract contract, int cityIndex)
         {
-            _bestFlowingContractsList[cityIndex].Add(contract);
+            _newFlowingContractsList[cityIndex].Add(contract);
 
-            FlowingStatusList[cityIndex] = new Status(_bestFlowingStatus[cityIndex].Weight + contract.TotalWeight,
-                                                      _bestFlowingStatus[cityIndex].WaggonCount + contract.WaggonCount);
+            _newFlowingStatusList[cityIndex] = new Status(_newFlowingStatusList[cityIndex].Weight + contract.TotalWeight,
+                                                          _newFlowingStatusList[cityIndex].WaggonCount + contract.WaggonCount);
         }
 
         public static void CompleateContractsInCityIndex(int cityIndex, int cityID)
         {
-            if(FlowingContractsList.Count < 1) { return; }
+            if(_newFlowingContractsList.Count < 1) { return; }
             List<DelieveryContract> contractsToRemove = new List<DelieveryContract>();
-            foreach(DelieveryContract contract in FlowingContractsList[cityIndex])
+            foreach(DelieveryContract contract in _newFlowingContractsList[cityIndex])
             {
                 if(contract.TargetCityID == cityID)
                 {
-                    _bestCompleatedContractsIDs.Add(contract.ID);
+                    _newCompleatedContractsIDs.Add(contract.ID);
                     contractsToRemove.Add(contract);
                 }
             }
 
             foreach( DelieveryContract contractToRemove in contractsToRemove)
             {
-                FlowingContractsList[cityIndex].Remove(contractToRemove);
+                _newFlowingContractsList[cityIndex].Remove(contractToRemove);
             }
             EvalStatusList();
         }
@@ -171,38 +212,47 @@ namespace Algorithm
             double weight;
             int waggonCount;
 
-            for( int cityIndex = 0; cityIndex <= _bestFlowingContractsList.LastIndex(); cityIndex++)
+            for( int cityIndex = 0; cityIndex <= _newFlowingContractsList.LastIndex(); cityIndex++)
             {
                 weight = 0;
                 waggonCount = 0;
 
-                foreach(DelieveryContract contract in _bestFlowingContractsList[cityIndex])
+                foreach(DelieveryContract contract in _newFlowingContractsList[cityIndex])
                 {
                     weight += contract.TotalWeight;
                     waggonCount += contract.WaggonCount;
                 }
 
-                FlowingStatusList[cityIndex] = new Status(weight, waggonCount);
+                _newFlowingStatusList[cityIndex] = new Status(weight, waggonCount);
             }
         }
 
-        public static void EvalCash()
+        public static void EvalCash(SolutionType solution)
         {
-            _cash = 0;
-
-            foreach(int contractID in _bestCompleatedContractsIDs)
+            if(solution == SolutionType.TheBest)
             {
-                _cash += World.Contracts.Find(contract => contract.ID == contractID).Payment;
+                _theBestCash = 0;
+                foreach(int contractID in _theBestCompleatedContractsIDs) { _theBestCash += World.Contracts.Find(contract => contract.ID == contractID).Payment; }
+            }
+            else if(solution == SolutionType.Better)
+            {
+                _betterCash = 0;
+                foreach (int contractID in _betterCompleatedContractsIDs) { _betterCash += World.Contracts.Find(contract => contract.ID == contractID).Payment; }
+            }
+            else if (solution == SolutionType.New)
+            {
+                _newCash = 0;
+                foreach (int contractID in _newCompleatedContractsIDs) { _newCash += World.Contracts.Find(contract => contract.ID == contractID).Payment; }
             }
         }
         
         public static void ShowFlowingContractsList()
         {
-            for (int cityIndex = 0; cityIndex <= FlowingContractsList.LastIndex(); cityIndex++)
+            for (int cityIndex = 0; cityIndex <= _newFlowingContractsList.LastIndex(); cityIndex++)
             {
                 Console.Write("\nIn CityIndex: " + cityIndex + "  we have: ");
 
-                foreach( DelieveryContract contract in FlowingContractsList[cityIndex])
+                foreach( DelieveryContract contract in _newFlowingContractsList[cityIndex])
                 {
                     Console.Write(contract.ID + ", ");
                 }
@@ -212,11 +262,11 @@ namespace Algorithm
 
         public static void MoveContractsForward(int currnetCityIndex)
         {
-            foreach(DelieveryContract contract in FlowingContractsList[currnetCityIndex])
+            foreach(DelieveryContract contract in _newFlowingContractsList[currnetCityIndex])
             {
-                if (FlowingContractsList[currnetCityIndex + 1].Exists(possibleTwin => possibleTwin.ID == contract.ID) == false)
+                if (_newFlowingContractsList[currnetCityIndex + 1].Exists(possibleTwin => possibleTwin.ID == contract.ID) == false)
                 {
-                    FlowingContractsList[currnetCityIndex + 1].Add(contract);
+                    _newFlowingContractsList[currnetCityIndex + 1].Add(contract);
                 }
             }
         }
