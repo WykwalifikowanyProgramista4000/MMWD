@@ -115,18 +115,20 @@ namespace ConsoleView
             ShowContracts();
             ShowLocomotive();
 
+            // ============================== The M A G I C
+
             AlgorithmImplementation.Solve();
+
+            // ==============================
 
             #region Sandbox
 
-            //List<KeyValuePair<int, double>> somekindofnigger = new List<KeyValuePair<int, double>>() { new KeyValuePair<int, double>(1, 12.3) };
-
-            //Console.WriteLine("\nklucz: " + somekindofnigger[0].Key + ", wartość: " + somekindofnigger[0].Value);
 
 
-        #endregion
 
-        Console.ReadLine();
+            #endregion
+
+            Console.ReadLine();
         }
 
         #region Methods
