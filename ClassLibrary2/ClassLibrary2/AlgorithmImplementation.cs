@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Algorithm.DataIO;
 
 namespace Algorithm
 {
@@ -26,10 +27,13 @@ namespace Algorithm
         private static double _contractLoopAlpha;
         private static bool _contractLoopAlphaSetFlag = false;
 
-        private static double _bestSolutionValue = -1;
-
-        private static List<int> _citiesToVisitID = new List<int>();
-        private static List<List<int>> _contractsToSignID = new List<List<int>>();
+        public static int _theBestIteration = 0;
+        public static double _bestSolutionValue = -1;
+        public static List<List<int>> _bestContractSet;
+        public static List<int> _bestCityRoute;
+        public static List<int> _bestCompleatedContractsIDs;
+        public static List<List<DelieveryContract>> _bestFlowingContractsList;
+        public static List<Status> _bestFlowingStatusList;
 
         private static Random _random = new Random();
 
@@ -138,74 +142,113 @@ namespace Algorithm
 
         #region Methods
 
+        #region Main Solve
+
         public static void Solve()
         {
             Stopwatch algorithmTimer = Stopwatch.StartNew();
             double temperature = _mainLoopTemperature;
+            int iteration = 0;
 
-            List<int> bestCityRoute = GenerateTemplateCityRoute();
-            List<int> newCityRoute;
+            Locomotive.BetterFlowingContractsList = new List<List<DelieveryContract>>();
+            Locomotive.BetterFlowingStatusList = new List<Status>();
 
-            List<List<int>> bestContractSet = FindBestContractsSet(bestCityRoute);
+            for( int i = 0; i <= MaxCityVisited; i++)
+            {
+                Locomotive.BetterFlowingContractsList.Add(new List<DelieveryContract>());
+                Locomotive.BetterFlowingStatusList.Add(new Status(0,0));
+            }
+
+            Locomotive.TheBestCityRoute = GenerateTemplateCityRoute();
+            Locomotive.NewCityRoute = new List<int>();
+
+            List<List<int>> bestContractSet = FindBestContractsSet(Locomotive.TheBestCityRoute); iteration++;
             List<List<int>> newContractSet;
 
-            double bestSolutionValue = CalculateSolutionValue(bestContractSet);
-            double newSolutionValue;
+            Locomotive.TheBestCash = CalculateSolutionValue(bestContractSet);
+            Locomotive.NewCash = 0;
 
-            while(temperature > 0.001)
+            //loging the first iteration
+            DataIO.DataOutput.SaveData(iteration, Locomotive.NewCityRoute, Locomotive.NewFlowingContractsList, Locomotive.TheBestCash, Locomotive.NewCash, temperature);
+
+            while (temperature > 0.001)
             {
-                newCityRoute = GenerateNextCityRoute(bestCityRoute);
-                newContractSet = FindBestContractsSet(newCityRoute);
-                newSolutionValue = CalculateSolutionValue(newContractSet);
+                Locomotive.NewCityRoute = GenerateNextCityRoute(Locomotive.TheBestCityRoute);
+                newContractSet = FindBestContractsSet(Locomotive.NewCityRoute);
+                Locomotive.NewCash = CalculateSolutionValue(newContractSet);
 
-                if(newSolutionValue > bestSolutionValue)
+                if(Locomotive.NewCash > Locomotive.TheBestCash)
                 {
-                    bestSolutionValue = newSolutionValue;
+                    Locomotive.TheBestCash = Locomotive.NewCash;
                     bestContractSet = newContractSet;
-                    bestSolutionValue = newSolutionValue;
+                    Locomotive.TheBestCityRoute = new List<int>(Locomotive.NewCityRoute);
+                    Locomotive.TheBestCompleatedContractsIDs = new List<int>(Locomotive.NewCompleatedContractsIDs);
+                    Locomotive.TheBestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.NewFlowingContractsList);
+                    Locomotive.TheBestFlowingStatusList = new List<Status>(Locomotive.NewFlowingStatusList);
                 }
-                else if(_random.NextDouble() > Math.Pow(Math.E, (bestSolutionValue - newSolutionValue) / temperature))
+                else if(_random.NextDouble() > Math.Pow(Math.E, (Locomotive.TheBestCash - Locomotive.NewCash) / temperature))
                 {
-                    bestSolutionValue = newSolutionValue;
+                    Locomotive.TheBestCash = Locomotive.NewCash;
                     bestContractSet = newContractSet;
-                    bestSolutionValue = newSolutionValue;
+                    Locomotive.TheBestCityRoute = new List<int>(Locomotive.NewCityRoute);
+                    Locomotive.TheBestCompleatedContractsIDs = new List<int>(Locomotive.NewCompleatedContractsIDs);
+                    Locomotive.TheBestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.NewFlowingContractsList);
+                    Locomotive.TheBestFlowingStatusList = new List<Status>(Locomotive.NewFlowingStatusList);
                 }
 
                 temperature *= _mainLoopAlpha;
+                iteration++;
+                DataIO.DataOutput.SaveData(iteration, Locomotive.NewCityRoute, Locomotive.NewFlowingContractsList, Locomotive.TheBestCash, Locomotive.NewCash, temperature);
+
+                // Algorytm zapisuje sobie prawdziwie najlepsze solucje :V
+                if(Locomotive.TheBestCash > _bestSolutionValue)
+                {
+                    _theBestIteration = iteration;
+                    _bestSolutionValue = Locomotive.TheBestCash;
+                    _bestContractSet = new List<List<int>>(bestContractSet);
+                    _bestCityRoute = new List<int>(Locomotive.TheBestCityRoute);
+                    _bestCompleatedContractsIDs = new List<int>(Locomotive.TheBestCompleatedContractsIDs);
+                    _bestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.TheBestFlowingContractsList);
+                    _bestFlowingStatusList = new List<Status>(Locomotive.TheBestFlowingStatusList);
+                }
             }
 
-            _bestSolutionValue = bestSolutionValue;
-            _citiesToVisitID = bestCityRoute;
-            _contractsToSignID = bestContractSet;
+            DataIO.DataOutput.SaveTheBestSolution(_theBestIteration, _bestSolutionValue, _bestCompleatedContractsIDs, _bestCityRoute, _bestFlowingContractsList, _bestFlowingStatusList);
+            DataIO.DataOutput.SaveCounters(algorithmTimer.ElapsedMilliseconds);
 
             algorithmTimer.Stop();
             Console.WriteLine("\nFinal solution value: " + _bestSolutionValue);
             Console.WriteLine("\nSolution took: " + algorithmTimer.ElapsedMilliseconds + " miliseconds");
         }
 
+        #endregion
+
+        #region Utilities
 
         private static double CalculateSolutionValue(List<List<int>> solution)
         {
-            double cashEarned = 0;
+            //double cashEarned = 0;
 
-            foreach(List<int> contractsIDs in solution)
-            {
-                foreach(int contractID in contractsIDs)
-                {
-                    foreach(City city in World.Cities)
-                    {
-                        DelieveryContract contract = city.GetDelieveryContractByID(contractID);
-                        if(contract != null)
-                        {
-                            cashEarned += contract.Payment;
-                        }
-                    }
-                }
-            }
+            //foreach(List<int> contractsIDs in solution)
+            //{
+            //    foreach(int contractID in contractsIDs)
+            //    {
+            //        foreach(City city in World.Cities)
+            //        {
+            //            DelieveryContract contract = city.GetDelieveryContractByID(contractID);
+            //            if(contract != null)
+            //            {
+            //                cashEarned += contract.Payment;
+            //            }
+            //        }
+            //    }
+            //}
 
-            Console.WriteLine("\n\tThis solution value is: " + cashEarned);
+            Locomotive.EvalCash(SolutionType.New);
 
-            return cashEarned;
+            Console.WriteLine("\n\tThis solution value is: " + Locomotive.NewCash);
+
+            return Locomotive.NewCash;
         } 
 
         public static IList<T> Swap<T>(this IList<T> list, int indexA, int indexB)
@@ -233,6 +276,8 @@ namespace Algorithm
             }
         }
 
+        #endregion
+
         #region City specific steps
 
         private static List<int> GenerateTemplateCityRoute()
@@ -248,43 +293,47 @@ namespace Algorithm
 
             Console.WriteLine("\n\n Cities to visit in first template solution: " + string.Join(", ", templateCityRoute.ToArray()));
 
+            Locomotive.TheBestCityRoute = templateCityRoute;
             return templateCityRoute;
         }
 
         private static List<int> GenerateNextCityRoute(List<int> cityRoute)
         {
-            List<int> newCitiesRoute = new List<int>(cityRoute);
+            List<int> newCitiyRoute = new List<int>(cityRoute);
             bool firstLoop = true;
 
             // we decide what city we want to swap. We will always change te next city hop, from city which index we randomly get
             // after the first loop, we will prioritize not changeing the currently established root, and not changeing the next hopcity if possible
-            for (int cityToSwapIndex = _random.Next(0, newCitiesRoute.LastIndex() - 1); cityToSwapIndex < newCitiesRoute.LastIndex(); cityToSwapIndex++) // we do it for the each remaining city in the loop
+            for (int cityToSwapIndex = _random.Next(0, newCitiyRoute.LastIndex() - 1); cityToSwapIndex < newCitiyRoute.LastIndex(); cityToSwapIndex++) // we do it for the each remaining city in the loop
             {
-                City currentCity = World.GetCityByID(newCitiesRoute[cityToSwapIndex]);
+                City currentCity = World.GetCityByID(newCitiyRoute[cityToSwapIndex]);
 
                 if(firstLoop == false)   // sprawdzamy czy jest to pierwsza pętla, ponieważ w niej priorytet ma zmiana
                 {
-                    if(currentCity.Connections.Exists(connection => connection.Key == newCitiesRoute[cityToSwapIndex + 1]))   // jeśli nie pierwsza to sprawdzamy czy w liście dostępnych następnych skoków znajduje się to samo miasto co na odpowiadającym indeksie w obecnej trasie
+                    if(currentCity.Connections.Exists(connection => connection.Key == newCitiyRoute[cityToSwapIndex + 1]))   // jeśli nie pierwsza to sprawdzamy czy w liście dostępnych następnych skoków znajduje się to samo miasto co na odpowiadającym indeksie w obecnej trasie
                     {
                         continue;
                     }
                 }
-
-                int nextHopIndex = _random.Next(0, currentCity.Connections.LastIndex());    // z listy następnych skoków wybieramy jeden
-
-                if (currentCity.Connections.Count > 1) // jeśli jest więcej niż 1 możliwy wybór to losujemy tak długo aż uda nam się w końcu zmienić na nowy :)
+                else
                 {
-                    while (currentCity.Connections[nextHopIndex].Key == newCitiesRoute[cityToSwapIndex + 1])
+                    int nextHopIndex = _random.Next(0, currentCity.Connections.LastIndex());    // z listy następnych skoków wybieramy jeden
+
+                    if (currentCity.Connections.Count > 1) // jeśli jest więcej niż 1 możliwy wybór to losujemy tak długo aż uda nam się w końcu zmienić na nowy :)
                     {
-                        nextHopIndex = _random.Next(0, currentCity.Connections.LastIndex());
+                        while (currentCity.Connections[nextHopIndex].Key == newCitiyRoute[cityToSwapIndex + 1])
+                        {
+                            nextHopIndex = _random.Next(0, currentCity.Connections.LastIndex());
+                        }
                     }
+                    newCitiyRoute[cityToSwapIndex + 1] = currentCity.Connections[nextHopIndex].Key;  // ustawiamy nowe miasto jako kolejne
                 }
 
-                newCitiesRoute[cityToSwapIndex + 1] = currentCity.Connections[nextHopIndex].Key;  // ustawiamy nowe miasto jako kolejne
                 firstLoop = false;
             }
 
-            return newCitiesRoute;
+            Locomotive.NewCityRoute = newCitiyRoute;
+            return newCitiyRoute;
         }
 
         #endregion
@@ -311,10 +360,13 @@ namespace Algorithm
                 if (bestValue <= newValue)  // in neighbouring better than current than current = neighbouring
                 {
                     bestContractsSet = new List<List<int>>(newContractsSet);
+                    Locomotive.BetterCompleatedContractsIDs = new List<int>(Locomotive.NewCompleatedContractsIDs);
+                    Locomotive.BetterFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.NewFlowingContractsList);
+                    Locomotive.BetterFlowingStatusList = new List<Status>(Locomotive.NewFlowingStatusList);
                 }
                 else if (_random.NextDouble() > Math.Pow( Math.E, (bestValue-newValue) / temperature))  // the sigma part of algorithm
                 {
-                    bestContractsSet = newContractsSet;
+                    bestContractsSet = new List<List<int>>(newContractsSet);
                 }
 
                 temperature *= _contractLoopAlpha;  // lowering the temperature with Alpha
@@ -325,91 +377,161 @@ namespace Algorithm
 
         private static List<List<int>> GenerateTemplateContractSet(List<int> cityRoute)
         {
-            List<List<int>> templateContractSet = new List<List<int>>();
-            // generating lists of contracts that will be signed up in each city
-            for (int currentCityIndex = 0; currentCityIndex < cityRoute.Count; currentCityIndex++)   // iterating through cities to visit
-            {
-                int cityToVisitID = cityRoute[currentCityIndex];
-                int contractsInCityCount = World.GetCityByID(cityToVisitID).DelieveryContracts.Count;
+            #region Reseting lists
 
+            List<List<int>> templateContractSet = new List<List<int>>();
+
+            Locomotive.NewCompleatedContractsIDs = new List<int>();
+            Locomotive.NewFlowingContractsList = new List<List<DelieveryContract>>();
+            Locomotive.NewFlowingStatusList = new List<Status>();
+
+            for (int i = 0; i <= MaxCityVisited; i++)
+            {
+                Locomotive.NewFlowingContractsList.Add(new List<DelieveryContract>());
+                Locomotive.NewFlowingStatusList.Add(new Status(0, 0));
+            }
+
+            #endregion
+
+            #region Adding Contracts
+
+            // generating lists of contracts that will be signed up in each city
+            for (int currentCityIndex = 0; currentCityIndex < cityRoute.LastIndex(); currentCityIndex++)   // iterating through cities in current city route
+            {
                 templateContractSet.Add(new List<int>());
 
-                List<int> possibleContractsID = new List<int>();
+                Locomotive.CompleateContractsInCityIndex(cityIndex: currentCityIndex, cityID: cityRoute[currentCityIndex]); // compleating contracts
 
-                foreach (DelieveryContract contract in World.GetCityByID(cityToVisitID).DelieveryContracts)  // iterating through the each city
+                #region Finding contracts that are possible to realize
+
+                City currentCity = World.GetCityByID(cityRoute[currentCityIndex]);  // current city
+                List<DelieveryContract> possibleContracts = new List<DelieveryContract>();
+
+                foreach (DelieveryContract contract in currentCity.DelieveryContracts)  // iterating through the contracts of each city in current route
                 {
                     if (cityRoute.
-                        GetRange(currentCityIndex + 1, cityRoute.Count - currentCityIndex - 1).    //todo I feelike it might go out of bounds, but it does not >:[
+                        GetRange(currentCityIndex + 1, cityRoute.Count - currentCityIndex - 1).    //todo I feel like it might go out of bounds, but it does not >:[
                         Exists(cityID => cityID == contract.TargetCityID))    // generating the list of contracts that have their target city futher in the cities to visit list
                     {
-                        possibleContractsID.Add(contract.ID);
+                        possibleContracts.Add(contract);
                     }
                 }
 
-                int maxContractsWeWantToAdd = _random.Next(0, possibleContractsID.Count); // we decide for the max number of contracts we want to add
+                #endregion
 
+                #region Adding conntracts to Lists
+
+                int maxContractsWeWantToAdd = _random.Next(0, possibleContracts.Count); // we decide for the max number of contracts we want to add
                 for (int i = 0; i < maxContractsWeWantToAdd; i++)  // and here we try to add contracts //todo need to add bounds with max weight and max waggon count
                 {
-                    if (possibleContractsID.Count > 0)   // randomly choosing contract from available ones
+                    if (possibleContracts.Count > 0)   
                     {
-                        int chosenContractIndex = _random.Next(0, possibleContractsID.Count - 1);
-                        templateContractSet[currentCityIndex].Add(possibleContractsID[chosenContractIndex]);
-                        possibleContractsID.Remove(possibleContractsID[chosenContractIndex]);
+                        int chosenContractIndex = _random.Next(0, possibleContracts.Count - 1); // randomly choosing contract from available ones
+
+                        if( Locomotive.BetterFlowingContractsList.Exists(hop => hop.Exists(contract => contract.ID == possibleContracts[chosenContractIndex].ID)) == false &&   // we check if we havent taken that contract already
+                            Locomotive.MaxWeight >= (Locomotive.BetterFlowingStatusList[currentCityIndex].Weight + possibleContracts[chosenContractIndex].TotalWeight) &&              // we check if we wont exceed the max weight!
+                            Locomotive.MaxWaggonCount >= (Locomotive.BetterFlowingStatusList[currentCityIndex].WaggonCount + possibleContracts[chosenContractIndex].WaggonCount)       // we check if we wont exceed the max waggon count :)
+                            ) // checking the bounds, if the contract we possibly want to add meets the requirements
+                        {
+                            Locomotive.SignContract(possibleContracts[chosenContractIndex], currentCityIndex); // adding contracts to list of contracts we take
+
+                            templateContractSet[currentCityIndex].Add(possibleContracts[chosenContractIndex].ID); // adding contracts to list of contracts we take in station
+                            possibleContracts.Remove(possibleContracts[chosenContractIndex]);   // removing from possibleContracts so we wont try to add the same contract twice
+                        }
                     }
                 }
+
+                #endregion
+
+                Locomotive.BetterCompleatedContractsIDs = new List<int>(Locomotive.NewCompleatedContractsIDs);
+                Locomotive.BetterFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.NewFlowingContractsList);
+                Locomotive.BetterFlowingStatusList = new List<Status>(Locomotive.NewFlowingStatusList);
+
+                Locomotive.ShowFlowingContractsList();
+                Locomotive.MoveContractsForward(currentCityIndex);
+                Locomotive.EvalStatusList();
             }
 
-            Console.WriteLine("\n Chosen contracts:");
-            for (int i = 0; i < cityRoute.Count; i++)
-            {
-                Console.WriteLine("\tIn city: '" + cityRoute[i] + "' we take contracts with ID: " + string.Join(",", templateContractSet[i].ToArray()));
-            }
+            #endregion
+
+            Locomotive.CompleateContractsInCityIndex(cityIndex: cityRoute.LastIndex(), cityID: cityRoute.Last()); // we complete contracts in last city
+            Locomotive.EvalStatusList();
+            Locomotive.ShowFlowingContractsList();
+
             return templateContractSet;
         }
 
         private static List<List<int>> GenerateNextContractSet(List<List<int>> contractSet, List<int> cityRoute)
         {
             List<List<int>> newContractsSet = new List<List<int>>(contractSet);
+            Locomotive.NewFlowingStatusList = new List<Status>(Locomotive.BetterFlowingStatusList);
+            Locomotive.NewFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.BetterFlowingContractsList);
+            Locomotive.NewCompleatedContractsIDs = new List<int>();
 
             #region Removing Contracts
+
             foreach (List<int> contractsList in newContractsSet) // we decide if we want ro remove any currently taken contracts
             {
                 if (contractsList.Count < 1) { continue; }  // checking if any contracts are available
 
-                int decisionInt = _random.Next(0, (contractsList.Count - 1) * 2);   // we decide if we want to remove anything
+                int contractToRemoveIndex = _random.Next(0, (contractsList.Count - 1) * 2);   // we decide if we want to remove anything
                                                                                     // and if yes then what is the index of it
-                if (decisionInt > contractsList.Count - 1) { continue; }
+                if (contractToRemoveIndex > contractsList.Count - 1) { continue; }
 
-                contractsList.Remove(contractsList[decisionInt]);   // we remove chosen element
+                foreach(List<DelieveryContract> contracts in Locomotive.NewFlowingContractsList) { contracts.RemoveAll(contract => contract.ID == contractsList[contractToRemoveIndex]);  } // wywalamy z flowing lista
+                Locomotive.NewCompleatedContractsIDs.RemoveAll(id => id == contractsList[contractToRemoveIndex]);
+                contractsList.Remove(contractsList[contractToRemoveIndex]);   // we remove chosen element
+                Locomotive.EvalStatusList();
             }
+
             #endregion
 
             #region Adding Contracts
-            List<int> contrIMightWntToTake = new List<int>();
 
-            for (int i=0; i < cityRoute.Count; i++) // przechodzimy przez wszystkie miasta w wektorze
+            List<DelieveryContract> possibleContracts = new List<DelieveryContract>();
+
+            for (int currentCityIndex = 0; currentCityIndex < cityRoute.LastIndex(); currentCityIndex++) // przechodzimy przez wszystkie miasta w wektorze
             {
-                contrIMightWntToTake = new List<int>();
+                Locomotive.CompleateContractsInCityIndex(cityIndex: currentCityIndex, cityID: cityRoute[currentCityIndex]);
 
-                foreach (DelieveryContract contract in World.GetCityByID(cityRoute[i]).DelieveryContracts) // przechodzimy przez wszystkie contrakty w każdym mieście
+                #region Finding possible contracts
+
+                possibleContracts = new List<DelieveryContract>();
+
+                foreach (DelieveryContract contract in World.GetCityByID(cityRoute[currentCityIndex]).DelieveryContracts) // przechodzimy przez wszystkie kontrakty w każdym mieście
                 {
-                    if(newContractsSet[i].Count < 1) { continue; }
-                    if(newContractsSet[i].Exists(id => id == contract.ID)) // sprawdzamy czy kontrakt jest już podpisany w rozwiązaniu
+                    //if(newContractsSet[currentCityIndex].Count < 1) { continue; } // this might speed up algorithm by a bit
+
+                    if( newContractsSet[currentCityIndex].Exists(id => id == contract.ID) == false &&   // sprawdzamy czy kontrakt jest już podpisany w rozwiązaniu
+                        Locomotive.NewFlowingContractsList.Exists(cityIndex => cityIndex.Exists(cont => cont.ID == contract.ID)) == false &&   // sprawdzamy czy kontrakt jest już podpisany w flowing contracts list
+                        cityRoute.FindIndex(cityId => cityId == contract.TargetCityID) > currentCityIndex   // sprawdzamy czy dotrzemy do celu tego kontraktu jeszcze kiedyś
+                        )
                     {
-                        continue; // jeśli tak to sprawdzamy kolejny kappa
-                    }
-                    else if(cityRoute.FindIndex(cityId => cityId == contract.TargetCityID) > i) // sprawdzamy czy dla tego kontraktu będziemy przejeżdżali w kolejnych krokach przez jego miasto docelowe
-                    {
-                        contrIMightWntToTake.Add(contract.ID); // jeśli nie jest już na liście i będziemy w kolejnych krokach przejeżdżali przez target city to dodajemy do listy potencalnych kontraktów
+                        possibleContracts.Add(contract); // jeśli nie jest już na liście i będziemy w kolejnych krokach przejeżdżali przez target city to dodajemy do listy potencalnych kontraktów
                     }
                 }
 
-                if(contrIMightWntToTake.Count < 1) { continue; }    // checking if there is at least one contract to sign in list of potential contracts
+                #endregion
 
-                int contractToAddIndex = _random.Next(0, contrIMightWntToTake.Count - 1); // randomly choosing contract to add from the list of available ones
+                if (possibleContracts.Count < 1) { continue; }    // checking if there is at least one contract to sign in list of potential contracts
 
-                newContractsSet[i].Add(contrIMightWntToTake[contractToAddIndex]);
+                int contractToAddIndex = _random.Next(0, possibleContracts.Count - 1); // randomly choosing contract to add from the list of available ones
+
+                if (Locomotive.MaxWeight >= (Locomotive.NewFlowingStatusList[currentCityIndex].Weight + possibleContracts[contractToAddIndex].TotalWeight) &&              // we check if we wont exceed the max weight!
+                    Locomotive.MaxWaggonCount >= (Locomotive.NewFlowingStatusList[currentCityIndex].WaggonCount + possibleContracts[contractToAddIndex].WaggonCount))       // we check if we wont exceed the max waggon count :)
+                {
+                    newContractsSet[currentCityIndex].Add(possibleContracts[contractToAddIndex].ID);
+                    Locomotive.SignContract(possibleContracts[contractToAddIndex], currentCityIndex);
+                    //Locomotive.ShowFlowingContractsList();
+                }
+                Locomotive.ShowFlowingContractsList();
+                Locomotive.MoveContractsForward(currentCityIndex);
+                Locomotive.EvalStatusList();
             }
+            Locomotive.CompleateContractsInCityIndex(cityIndex: cityRoute.LastIndex(), cityID: cityRoute.Last()); // we complete contracts in last city
+            Locomotive.EvalStatusList();
+            Locomotive.ShowFlowingContractsList();
+
             #endregion
 
             return newContractsSet;

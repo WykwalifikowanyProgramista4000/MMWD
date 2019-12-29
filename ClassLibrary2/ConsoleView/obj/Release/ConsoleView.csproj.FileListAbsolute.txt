@@ -1,0 +1,10 @@
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ConsoleView\bin\Release\ConsoleView.exe.config
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ConsoleView\bin\Release\ConsoleView.exe
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ConsoleView\bin\Release\ConsoleView.pdb
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ConsoleView\bin\Release\Algorithm.dll
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ConsoleView\bin\Release\Algorithm.pdb
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ConsoleView\obj\Release\ConsoleView.csprojAssemblyReference.cache
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ConsoleView\obj\Release\ConsoleView.csproj.CoreCompileInputs.cache
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ConsoleView\obj\Release\ConsoleView.csproj.CopyComplete
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ConsoleView\obj\Release\ConsoleView.exe
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ConsoleView\obj\Release\ConsoleView.pdb
