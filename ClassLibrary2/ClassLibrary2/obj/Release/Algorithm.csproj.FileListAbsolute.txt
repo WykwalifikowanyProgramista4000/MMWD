@@ -1,0 +1,6 @@
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\bin\Release\Algorithm.dll
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\bin\Release\Algorithm.pdb
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Release\Algorithm.csprojAssemblyReference.cache
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Release\Algorithm.csproj.CoreCompileInputs.cache
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Release\Algorithm.dll
+C:\Users\wojte\Documents\AGH\AGH_sem_5\MMWD\MMWD_repo\ClassLibrary2\ClassLibrary2\obj\Release\Algorithm.pdb

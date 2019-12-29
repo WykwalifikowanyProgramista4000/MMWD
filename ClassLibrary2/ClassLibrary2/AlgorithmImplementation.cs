@@ -27,10 +27,13 @@ namespace Algorithm
         private static double _contractLoopAlpha;
         private static bool _contractLoopAlphaSetFlag = false;
 
-        private static double _bestSolutionValue = -1;
-
-        private static List<int> _citiesToVisitID = new List<int>();
-        private static List<List<int>> _contractsToSignID = new List<List<int>>();
+        public static int _theBestIteration = 0;
+        public static double _bestSolutionValue = -1;
+        public static List<List<int>> _bestContractSet;
+        public static List<int> _bestCityRoute;
+        public static List<int> _bestCompleatedContractsIDs;
+        public static List<List<DelieveryContract>> _bestFlowingContractsList;
+        public static List<Status> _bestFlowingStatusList;
 
         private static Random _random = new Random();
 
@@ -145,6 +148,7 @@ namespace Algorithm
         {
             Stopwatch algorithmTimer = Stopwatch.StartNew();
             double temperature = _mainLoopTemperature;
+            int iteration = 0;
 
             Locomotive.BetterFlowingContractsList = new List<List<DelieveryContract>>();
             Locomotive.BetterFlowingStatusList = new List<Status>();
@@ -155,49 +159,62 @@ namespace Algorithm
                 Locomotive.BetterFlowingStatusList.Add(new Status(0,0));
             }
 
-            List<int> bestCityRoute = GenerateTemplateCityRoute();
-            List<int> newCityRoute;
+            Locomotive.TheBestCityRoute = GenerateTemplateCityRoute();
+            Locomotive.NewCityRoute = new List<int>();
 
-            List<List<int>> bestContractSet = FindBestContractsSet(bestCityRoute);
+            List<List<int>> bestContractSet = FindBestContractsSet(Locomotive.TheBestCityRoute); iteration++;
             List<List<int>> newContractSet;
 
-            double bestSolutionValue = CalculateSolutionValue(bestContractSet);
-            double newSolutionValue;
+            Locomotive.TheBestCash = CalculateSolutionValue(bestContractSet);
+            Locomotive.NewCash = 0;
 
-            while(temperature > 0.001)
+            //loging the first iteration
+            DataIO.DataOutput.SaveData(iteration, Locomotive.NewCityRoute, Locomotive.NewFlowingContractsList, Locomotive.TheBestCash, Locomotive.NewCash, temperature);
+
+            while (temperature > 0.001)
             {
-                newCityRoute = GenerateNextCityRoute(bestCityRoute);
-                newContractSet = FindBestContractsSet(newCityRoute);
-                newSolutionValue = CalculateSolutionValue(newContractSet);
+                Locomotive.NewCityRoute = GenerateNextCityRoute(Locomotive.TheBestCityRoute);
+                newContractSet = FindBestContractsSet(Locomotive.NewCityRoute);
+                Locomotive.NewCash = CalculateSolutionValue(newContractSet);
 
-                if(newSolutionValue > bestSolutionValue)
+                if(Locomotive.NewCash > Locomotive.TheBestCash)
                 {
-                    bestSolutionValue = newSolutionValue;
+                    Locomotive.TheBestCash = Locomotive.NewCash;
                     bestContractSet = newContractSet;
-                    bestSolutionValue = newSolutionValue;
                     Locomotive.TheBestCityRoute = new List<int>(Locomotive.NewCityRoute);
-                    Locomotive.TheBestCompleatedContractsIDs = new List<int>(Locomotive.TheBestCompleatedContractsIDs);
-                    Locomotive.TheBestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.TheBestFlowingContractsList);
-                    Locomotive.TheBestFlowingStatusList = new List<Status>(Locomotive.TheBestFlowingStatusList);
+                    Locomotive.TheBestCompleatedContractsIDs = new List<int>(Locomotive.NewCompleatedContractsIDs);
+                    Locomotive.TheBestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.NewFlowingContractsList);
+                    Locomotive.TheBestFlowingStatusList = new List<Status>(Locomotive.NewFlowingStatusList);
                 }
-                else if(_random.NextDouble() > Math.Pow(Math.E, (bestSolutionValue - newSolutionValue) / temperature))
+                else if(_random.NextDouble() > Math.Pow(Math.E, (Locomotive.TheBestCash - Locomotive.NewCash) / temperature))
                 {
-                    bestSolutionValue = newSolutionValue;
+                    Locomotive.TheBestCash = Locomotive.NewCash;
                     bestContractSet = newContractSet;
-                    bestSolutionValue = newSolutionValue;
                     Locomotive.TheBestCityRoute = new List<int>(Locomotive.NewCityRoute);
-                    Locomotive.TheBestCompleatedContractsIDs = new List<int>(Locomotive.TheBestCompleatedContractsIDs);
-                    Locomotive.TheBestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.TheBestFlowingContractsList);
-                    Locomotive.TheBestFlowingStatusList = new List<Status>(Locomotive.TheBestFlowingStatusList);
+                    Locomotive.TheBestCompleatedContractsIDs = new List<int>(Locomotive.NewCompleatedContractsIDs);
+                    Locomotive.TheBestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.NewFlowingContractsList);
+                    Locomotive.TheBestFlowingStatusList = new List<Status>(Locomotive.NewFlowingStatusList);
                 }
 
                 temperature *= _mainLoopAlpha;
-                DataIO.DataOutput.SaveData(temperature, newSolutionValue, bestSolutionValue);
+                iteration++;
+                DataIO.DataOutput.SaveData(iteration, Locomotive.NewCityRoute, Locomotive.NewFlowingContractsList, Locomotive.TheBestCash, Locomotive.NewCash, temperature);
+
+                // Algorytm zapisuje sobie prawdziwie najlepsze solucje :V
+                if(Locomotive.TheBestCash > _bestSolutionValue)
+                {
+                    _theBestIteration = iteration;
+                    _bestSolutionValue = Locomotive.TheBestCash;
+                    _bestContractSet = new List<List<int>>(bestContractSet);
+                    _bestCityRoute = new List<int>(Locomotive.TheBestCityRoute);
+                    _bestCompleatedContractsIDs = new List<int>(Locomotive.TheBestCompleatedContractsIDs);
+                    _bestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.TheBestFlowingContractsList);
+                    _bestFlowingStatusList = new List<Status>(Locomotive.TheBestFlowingStatusList);
+                }
             }
 
-            _bestSolutionValue = bestSolutionValue;
-            _citiesToVisitID = bestCityRoute;
-            _contractsToSignID = bestContractSet;
+            DataIO.DataOutput.SaveTheBestSolution(_theBestIteration, _bestSolutionValue, _bestCompleatedContractsIDs, _bestCityRoute, _bestFlowingContractsList, _bestFlowingStatusList);
+            DataIO.DataOutput.SaveCounters(algorithmTimer.ElapsedMilliseconds);
 
             algorithmTimer.Stop();
             Console.WriteLine("\nFinal solution value: " + _bestSolutionValue);
@@ -393,7 +410,7 @@ namespace Algorithm
                 foreach (DelieveryContract contract in currentCity.DelieveryContracts)  // iterating through the contracts of each city in current route
                 {
                     if (cityRoute.
-                        GetRange(currentCityIndex + 1, cityRoute.Count - currentCityIndex - 1).    //todo I feelike it might go out of bounds, but it does not >:[
+                        GetRange(currentCityIndex + 1, cityRoute.Count - currentCityIndex - 1).    //todo I feel like it might go out of bounds, but it does not >:[
                         Exists(cityID => cityID == contract.TargetCityID))    // generating the list of contracts that have their target city futher in the cities to visit list
                     {
                         possibleContracts.Add(contract);
