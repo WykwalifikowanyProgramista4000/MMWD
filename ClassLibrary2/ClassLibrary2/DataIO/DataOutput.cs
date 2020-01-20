@@ -14,6 +14,8 @@ namespace Algorithm.DataIO
 
         private static List<int> _contractTimesTaken = new List<int>();
 
+        private static DateTime testDate = DateTime.Now;
+
         private static string _line = "";
 
         #region Gaj request 
@@ -82,7 +84,7 @@ namespace Algorithm.DataIO
 
             #endregion
 
-            using (_streamWriter = new System.IO.StreamWriter(OutputPath + "//" + SaveFileName + ".txt", true))
+            using (_streamWriter = new System.IO.StreamWriter(OutputPath + "//" + SaveFileName + String.Format("_{0}{1}{2}", testDate.Hour, testDate.Minute, testDate.Second) + ".txt", true))
             {
                 _streamWriter.WriteLine(_line);
             }
@@ -129,13 +131,13 @@ namespace Algorithm.DataIO
                 _line += String.Format("{0}:-> weight:{0}, wagon_count:{1}\n", bestCityRoute[i], theBestFlowingStatusList[i].Weight, theBestFlowingStatusList[i].WaggonCount);
             }
 
-            using (_streamWriter = new System.IO.StreamWriter(OutputPath + "//" + SaveFileName + ".txt", true))
+            using (_streamWriter = new System.IO.StreamWriter(OutputPath + "//" + SaveFileName + String.Format("_{0}{1}{2}", testDate.Hour, testDate.Minute, testDate.Second) + ".txt", true))
             {
                 _streamWriter.WriteLine("Optimal solution:");
                 _streamWriter.WriteLine(_line + "\n");
             }
 
-            using (_streamWriter = new System.IO.StreamWriter(OutputPath + "//" + SaveFileName + "_solutionVector.txt", true)) // Gaju 
+            using (_streamWriter = new System.IO.StreamWriter(OutputPath + "//" + SaveFileName + "_solutionVector" + String.Format("_{0}{1}{2}", testDate.Hour, testDate.Minute, testDate.Second) + ".txt", true)) // Gaju 
             {
                 foreach (double value in _solutionVector)
                 {
@@ -150,7 +152,7 @@ namespace Algorithm.DataIO
             //  sigmaStuff = 0  ->  the solution stays the same, sigma did nothing 
             //  sigmaStuff = -1 ->  sigma did its magic, best solution is now worst then before 
 
-            using (_streamWriter = new System.IO.StreamWriter(OutputPath + "//" + SaveFileName  + "_sigmaBestVector.txt", true)) // Gaju 
+            using (_streamWriter = new System.IO.StreamWriter(OutputPath + "//" + SaveFileName  + "_sigmaBestVector" + String.Format("_{0}{1}{2}", testDate.Hour, testDate.Minute, testDate.Second)  + ".txt", true)) // Gaju 
             {
                 _streamWriter.WriteLine(sigmaBestSolution + " ; " + sigmaStuff);
             }
@@ -158,7 +160,7 @@ namespace Algorithm.DataIO
 
         public static void SaveCounters(long elapsedTime)
         {
-            using (_streamWriter = new System.IO.StreamWriter(OutputPath + "//" + SaveFileName + ".txt", true))
+            using (_streamWriter = new System.IO.StreamWriter(OutputPath + "//" + SaveFileName + String.Format("_{0}{1}{2}", testDate.Hour, testDate.Minute, testDate.Second) + ".txt", true))
             {
                 _streamWriter.WriteLine(String.Format("Finding optimal solution took: {0}ms\n", elapsedTime));
 

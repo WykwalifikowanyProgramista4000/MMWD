@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Algorithm;
 using Algorithm.DataIO;
 using System.Windows.Forms;
+using System.IO;
 
 namespace ConsoleView
 {
@@ -206,7 +207,8 @@ namespace ConsoleView
 
                 #region Data output 
 
-                DataOutput.OutputPath = AppDomain.CurrentDomain.BaseDirectory;
+                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "tests");
+                DataOutput.OutputPath = AppDomain.CurrentDomain.BaseDirectory + "tests";
                 DataOutput.SaveFileName = "default_test_plan";
 
                 #endregion

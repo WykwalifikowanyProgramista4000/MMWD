@@ -1,8 +1,0 @@
-iteration:1;
-path;
-flowing_list:
-best_value:300;
-current_value:0;
-temperature:100,00;
-======================================
-
