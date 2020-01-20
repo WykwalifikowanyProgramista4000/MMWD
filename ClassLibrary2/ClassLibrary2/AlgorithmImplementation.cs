@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Algorithm.DataIO;
 
@@ -146,6 +147,18 @@ namespace Algorithm
 
         public static void Solve()
         {
+            StringBuilder iterBuilder = new StringBuilder();
+            var progress = new ProgressBar();
+            int i_to_fin = 1;
+            double oldPerc = 0;
+            double currentPerc = 0;
+            double temp_T = MainLoopTemperature;
+            while (temp_T > 0.001)
+            {
+                temp_T *= MainLoopAlpha;
+                i_to_fin++;
+            }
+
             Stopwatch algorithmTimer = Stopwatch.StartNew();
             double temperature = _mainLoopTemperature;
             int iteration = 0;
@@ -185,8 +198,9 @@ namespace Algorithm
                     Locomotive.TheBestCompleatedContractsIDs = new List<int>(Locomotive.NewCompleatedContractsIDs);
                     Locomotive.TheBestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.NewFlowingContractsList);
                     Locomotive.TheBestFlowingStatusList = new List<Status>(Locomotive.NewFlowingStatusList);
+                    DataOutput.SaveSigmaBest(Locomotive.TheBestCash, 1);
                 }
-                else if(_random.NextDouble() > Math.Pow(Math.E, (Locomotive.TheBestCash - Locomotive.NewCash) / temperature))
+                else if(_random.NextDouble() < Math.Pow(Math.E, (Locomotive.NewCash - Locomotive.TheBestCash) / temperature))
                 {
                     Locomotive.TheBestCash = Locomotive.NewCash;
                     bestContractSet = newContractSet;
@@ -194,6 +208,11 @@ namespace Algorithm
                     Locomotive.TheBestCompleatedContractsIDs = new List<int>(Locomotive.NewCompleatedContractsIDs);
                     Locomotive.TheBestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.NewFlowingContractsList);
                     Locomotive.TheBestFlowingStatusList = new List<Status>(Locomotive.NewFlowingStatusList);
+                    DataOutput.SaveSigmaBest(Locomotive.TheBestCash, -1);
+                }
+                else
+                {
+                    DataOutput.SaveSigmaBest(Locomotive.TheBestCash, 0);
                 }
 
                 temperature *= _mainLoopAlpha;
@@ -211,14 +230,28 @@ namespace Algorithm
                     _bestFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.TheBestFlowingContractsList);
                     _bestFlowingStatusList = new List<Status>(Locomotive.TheBestFlowingStatusList);
                 }
+
+                currentPerc = ((double)iteration / (double)i_to_fin);
+                if ( oldPerc < currentPerc )
+                {
+                    oldPerc = currentPerc;
+                    progress.Report(oldPerc);
+
+                    if (oldPerc >= 1)
+                    {
+                        progress.Dispose();
+                        Console.WriteLine("[##########] 100%");
+                    }
+                    //Console.WriteLine(oldPerc + "%");
+                }
             }
 
             DataIO.DataOutput.SaveTheBestSolution(_theBestIteration, _bestSolutionValue, _bestCompleatedContractsIDs, _bestCityRoute, _bestFlowingContractsList, _bestFlowingStatusList);
             DataIO.DataOutput.SaveCounters(algorithmTimer.ElapsedMilliseconds);
 
             algorithmTimer.Stop();
-            Console.WriteLine("\nFinal solution value: " + _bestSolutionValue);
-            Console.WriteLine("\nSolution took: " + algorithmTimer.ElapsedMilliseconds + " miliseconds");
+            //Console.WriteLine("\nFinal solution value: " + _bestSolutionValue);
+            Console.WriteLine("Solution took: " + algorithmTimer.ElapsedMilliseconds + " miliseconds");
         }
 
         #endregion
@@ -228,7 +261,6 @@ namespace Algorithm
         private static double CalculateSolutionValue(List<List<int>> solution)
         {
             //double cashEarned = 0;
-
             //foreach(List<int> contractsIDs in solution)
             //{
             //    foreach(int contractID in contractsIDs)
@@ -245,8 +277,7 @@ namespace Algorithm
             //}
 
             Locomotive.EvalCash(SolutionType.New);
-
-            Console.WriteLine("\n\tThis solution value is: " + Locomotive.NewCash);
+            //Console.WriteLine("\n\tThis solution value is: " + Locomotive.NewCash);
 
             return Locomotive.NewCash;
         } 
@@ -291,7 +322,7 @@ namespace Algorithm
                 templateCityRoute.Add(currentCity.Connections[_random.Next(0, currentCity.Connections.LastIndex())].Key); // pseudorandomly adding next city to current solution
             }
 
-            Console.WriteLine("\n\n Cities to visit in first template solution: " + string.Join(", ", templateCityRoute.ToArray()));
+            //Console.WriteLine("\n\n Cities to visit in first template solution: " + string.Join(", ", templateCityRoute.ToArray()));
 
             Locomotive.TheBestCityRoute = templateCityRoute;
             return templateCityRoute;
@@ -364,7 +395,7 @@ namespace Algorithm
                     Locomotive.BetterFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.NewFlowingContractsList);
                     Locomotive.BetterFlowingStatusList = new List<Status>(Locomotive.NewFlowingStatusList);
                 }
-                else if (_random.NextDouble() > Math.Pow( Math.E, (bestValue-newValue) / temperature))  // the sigma part of algorithm
+                else if (_random.NextDouble() < Math.Pow( Math.E, (newValue - bestValue) / temperature))  // the sigma part of algorithm
                 {
                     bestContractsSet = new List<List<int>>(newContractsSet);
                 }
@@ -447,7 +478,7 @@ namespace Algorithm
                 Locomotive.BetterFlowingContractsList = new List<List<DelieveryContract>>(Locomotive.NewFlowingContractsList);
                 Locomotive.BetterFlowingStatusList = new List<Status>(Locomotive.NewFlowingStatusList);
 
-                Locomotive.ShowFlowingContractsList();
+                //Locomotive.ShowFlowingContractsList();
                 Locomotive.MoveContractsForward(currentCityIndex);
                 Locomotive.EvalStatusList();
             }
@@ -456,7 +487,7 @@ namespace Algorithm
 
             Locomotive.CompleateContractsInCityIndex(cityIndex: cityRoute.LastIndex(), cityID: cityRoute.Last()); // we complete contracts in last city
             Locomotive.EvalStatusList();
-            Locomotive.ShowFlowingContractsList();
+            //Locomotive.ShowFlowingContractsList();
 
             return templateContractSet;
         }
@@ -524,13 +555,13 @@ namespace Algorithm
                     Locomotive.SignContract(possibleContracts[contractToAddIndex], currentCityIndex);
                     //Locomotive.ShowFlowingContractsList();
                 }
-                Locomotive.ShowFlowingContractsList();
+                //Locomotive.ShowFlowingContractsList();
                 Locomotive.MoveContractsForward(currentCityIndex);
                 Locomotive.EvalStatusList();
             }
             Locomotive.CompleateContractsInCityIndex(cityIndex: cityRoute.LastIndex(), cityID: cityRoute.Last()); // we complete contracts in last city
             Locomotive.EvalStatusList();
-            Locomotive.ShowFlowingContractsList();
+            //Locomotive.ShowFlowingContractsList();
 
             #endregion
 

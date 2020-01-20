@@ -119,12 +119,17 @@ namespace Algorithm.DataIO
                 file.Close();
             }
 
-            foreach(var city in World.Cities)
+            PrepCityAndContractCounters();
+        }
+
+        public static void PrepCityAndContractCounters()
+        {
+            foreach (var city in World.Cities)
             {
                 DataOutput.CityTimesVisited.Add(0);
             }
 
-            foreach(var contract in World.Contracts)
+            foreach (var contract in World.Contracts)
             {
                 DataOutput.ContractTimesTaken.Add(0);
             }
